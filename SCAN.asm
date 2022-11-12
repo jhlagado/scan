@@ -15,7 +15,7 @@
         DSIZE       EQU $80
         RSIZE       EQU $80
         LSIZE       EQU $80
-        TIBSIZE     EQU $100		; 256 bytes , along line!
+        TIBSIZE     EQU $100	; 256 bytes , along line!
         TRUE        EQU 1		; not FF, for SCAN
         FALSE       EQU 0
         EMPTY       EQU 0		; for an empty macro, ctrl-<something>=macro, ie ctrl-h = backspace macros (in SCAN)
@@ -94,7 +94,39 @@ iOpcodes:
         DB    lsb(nop_)     ;   STX 
         DB    lsb(etx_)     ;   ETX 
 
-        REPDAT 29, lsb(nop_)
+        LITDAT 29
+        ; REPDAT 29, lsb(nop_)
+        
+        
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
+        DB    lsb(nop_)     ;               
 
         LITDAT 15
         DB    lsb(store_)   ;   !            
@@ -113,7 +145,18 @@ iOpcodes:
         DB    lsb(dot_)    ;    .
         DB    lsb(div_)    ;    /	;/MOD
 
-        REPDAT 10, lsb(num_)		; 10 x repeat lsb of add to the num routine 
+        ; REPDAT 10, lsb(num_)		; 10 x repeat lsb of add to the num routine 
+        LITDAT 10
+        DB    lsb(num_)     ;               
+        DB    lsb(num_)     ;               
+        DB    lsb(num_)     ;               
+        DB    lsb(num_)     ;               
+        DB    lsb(num_)     ;               
+        DB    lsb(num_)     ;               
+        DB    lsb(num_)     ;               
+        DB    lsb(num_)     ;               
+        DB    lsb(num_)     ;               
+        DB    lsb(num_)     ;               
 
         LITDAT 7
         DB    lsb(def_)    ;    :        
@@ -124,7 +167,34 @@ iOpcodes:
         DB    lsb(key_)    ;    ?   ( -- val )  read a char from input
         DB    lsb(fetch_)  ;    @    
 
-        REPDAT 26, lsb(call_)		; call a command A, B ....Z
+        ; REPDAT 26, lsb(call_)		; call a command A, B ....Z
+        LITDAT 26
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
+        DB    lsb(call_)     ;               
 
         LITDAT 6
         DB    lsb(arrDef_) ;    [
@@ -134,7 +204,34 @@ iOpcodes:
         DB    lsb(neg_)    ;    _
         DB    lsb(str_)    ;    `    	; for printing `hello`        
 
-        REPDAT 26, lsb(var_)		; a b c .....z
+        ; REPDAT 26, lsb(var_)		; a b c .....z
+        LITDAT 26
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
+        DB    lsb(var_)     ;               
 
         LITDAT 5
         DB    lsb(shl_)    ;    {
@@ -162,7 +259,23 @@ iOpcodes:
         DB     lsb(EMPTY)       ; SI  ^O 15
         DB     lsb(printStack_) ; DLE ^P 16
 
-        REPDAT 15, lsb(EMPTY)
+        ; REPDAT 15, lsb(EMPTY)
+        LITDAT 15
+        DB    lsb(EMPTY)    ;               
+        DB    lsb(EMPTY)    ;               
+        DB    lsb(EMPTY)    ;               
+        DB    lsb(EMPTY)    ;               
+        DB    lsb(EMPTY)    ;               
+        DB    lsb(EMPTY)    ;               
+        DB    lsb(EMPTY)    ;               
+        DB    lsb(EMPTY)    ;               
+        DB    lsb(EMPTY)    ;               
+        DB    lsb(EMPTY)    ;               
+        DB    lsb(EMPTY)    ;               
+        DB    lsb(EMPTY)    ;               
+        DB    lsb(EMPTY)    ;               
+        DB    lsb(EMPTY)    ;               
+        DB    lsb(EMPTY)    ;               
 
         LITDAT 5
         DB     lsb(aNop_)       ;a0    SP  				;space
@@ -171,7 +284,11 @@ iOpcodes:
         DB     lsb(util_)       ;a3    \#  utility command		; table of special routines ie #5 etc				
         DB     lsb(newln_)      ;a4    \$  prints a newline to output	
 
-        REPDAT 3, lsb(aNop_)
+        ; REPDAT 3, lsb(aNop_)
+        LITDAT 3
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
 
         LITDAT 8
         DB     lsb(aNop_)       ;a8    \(  ( b -- )              
@@ -183,7 +300,18 @@ iOpcodes:
         DB     lsb(prnStr_)     ;ae    \.  ( b -- ) prints a string from add term by null char             
         DB     lsb(aNop_)       ;af    \/                
 
-        REPDAT 10, lsb(aNop_)
+        ; REPDAT 10, lsb(aNop_)
+        LITDAT 10
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
 
         LITDAT 7
         DB     lsb(anonDef_)    ;ba    \:	return add of a anon def, \: 1 2 3;    \\ ret add of this                
@@ -194,7 +322,34 @@ iOpcodes:
         DB     lsb(aNop_)       ;bf    \?
         DB     lsb(cFetch_)     ;c0    \@      byte fetch
 
-        REPDAT 26, lsb(aNop_)
+        ; REPDAT 26, lsb(aNop_)
+        LITDAT 26
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
+        DB    lsb(aNop_)    ;               
 
         LITDAT 6
         DB     lsb(cArrDef_)    ;db     \[
@@ -204,13 +359,39 @@ iOpcodes:
         DB     lsb(eret_)       ;       \_  ( b -- ) conditional early return - stop everything           
         DB     lsb(strDef_)     ;e0     \`  ( -- adr ) defines a string \` string ` then use \. to prt            
 
-        REPDAT 8, lsb(altVar_)  ;e1	\a...\h
-
+        ; REPDAT 8, lsb(altVar_)  ;e1	\a...\h
+        LITDAT 8
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+    
         LITDAT 2
         DB     lsb(i_)          ;e9    i  ; returns index variable of current loop          
         DB     lsb(j_)          ;e9    j  ; returns index variable of outer loop     \i+6     
 
-        REPDAT 16, lsb(altVar_)		; \k...\z
+        ; REPDAT 16, lsb(altVar_)		; \k...\z
+        LITDAT 16
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
+        DB      lsb(altVar_)
 
         LITDAT 5
         DB    lsb(rpop_)        ;       { ( -- n ) pop from SCAN return stack 
@@ -233,7 +414,7 @@ start:
         LD SP,DSTACK		; start of SCAN
         CALL init		; setups
         CALL printStr		; prog count to stack, put code line 235 on stack then call print
-        .cstr "SCAN V1.1\r\n"
+        .cstr "SCAN V0.0\r\n"
 
 interpret:
         call prompt

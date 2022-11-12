@@ -30,5 +30,5 @@ testGetCharImpl:
         POP HL
         RET                 ;NZ flagged if character input
 
-.include "MINT.asm"
+.include "SCAN.asm"
 .include "ram.asm"

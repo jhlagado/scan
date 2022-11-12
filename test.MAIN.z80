@@ -7,7 +7,7 @@
     CALL init
     JP testsStart
     
-    .include "MINT.asm"
+    .include "SCAN.asm"
     .include "ram.asm"
     .include "test.util.mac.asm"
     .include "test.tester.mac.asm"
