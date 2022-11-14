@@ -48,36 +48,36 @@
 ; **************************************************************************
 macros:
 
-backsp_:
-        DB "\\c@0=0=(\\c@1-\\c!`\b \b`);"	;ctr-h  , \ needed inside control code, escape it with anothe \
-                                            	; \c tib add of tib, not visible
-                                         	;@ fetch val
-                                          	;1- reduce
-                                          	;c! store
-                                          	;`\b move cursor back, terminal command
-                                          	;the space between the \b is to over write
-                                            	;
+; backsp_:
+;         DB "\\c@0=0=(\\c@1-\\c!`\b \b`);"	;ctr-h  , \ needed inside control code, escape it with anothe \
+;                                             	; \c tib add of tib, not visible
+;                                          	;@ fetch val
+;                                           	;1- reduce
+;                                           	;c! store
+;                                           	;`\b move cursor back, terminal command
+;                                           	;the space between the \b is to over write
+;                                             	;
 	
-reedit_:
-        DB "\\e\\@\\#6;"			; remembers last line edited
+; reedit_:
+;         DB "\\e\\@\\#6;"			; remembers last line edited
 
-edit_:
-        .cstr "`?`?\\#5\\#6;"
+; edit_:
+;         .cstr "`?`?\\#5\\#6;"
 
-list_:
-        .cstr "\\$26(\\i@65+\\#6\\c@0>(\\$))\\#5;"
+; list_:
+;         .cstr "\\$26(\\i@65+\\#6\\c@0>(\\$))\\#5;"
 
-printStack_:
-        .cstr "\\#4\\#5;"        
+; printStack_:
+;         .cstr "\\#4\\#5;"        
 
-toggleBase_:
-        .cstr "\\b@0=\\b!;"
+; toggleBase_:
+;         .cstr "\\b@0=\\b!;"
 
 
 ; ***********************************************************************
 ; Initial values for user mintVars		
 ; ***********************************************************************		
-iAltVars:			; value copied into tables
+iAltVars:			            ; value copied into tables
         DW dStack               ; a vS0 start of datastack			
         DW FALSE                ; b vBase16 
         DW 0                    ; c vTIBPtr an offset to the tib
@@ -87,318 +87,316 @@ iAltVars:			; value copied into tables
         DW page6                ; g 256 bytes limits
         DW HEAP                 ; h vHeapPtr \h start of the free mem
 
+
+
 iOpcodes:
         LITDAT 4		; macros for compression
-        DB    lsb(exit_)    ;   NUL get least signif byte of address exit_
-        DB    lsb(nop_)     ;   SOH 
-        DB    lsb(nop_)     ;   STX 
-        DB    lsb(etx_)     ;   ETX 
+        DB lsb(exit_)    ;   NUL get least signif byte of address exit_
+        DB lsb(nop_)     ;   SOH 
+        DB lsb(nop_)     ;   STX 
+        DB lsb(etx_)     ;   ETX 
 
         LITDAT 29
         ; REPDAT 29, lsb(nop_)
-        
-        
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
-        DB    lsb(nop_)     ;               
+
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
+        DB lsb(nop_)     ;               
 
         LITDAT 15
-        DB    lsb(store_)   ;   !            
-        DB    lsb(dup_)     ;   "
-        DB    lsb(hex_)    ;    #
-        DB    lsb(swap_)   ;    $            
-        DB    lsb(over_)   ;    %            
-        DB    lsb(and_)    ;    &
-        DB    lsb(drop_)   ;    '
-        DB    lsb(begin_)  ;    (        
-        DB    lsb(again_)  ;    )
-        DB    lsb(mul_)    ;    *            
-        DB    lsb(add_)    ;    +
-        DB    lsb(hdot_)   ;    ,            
-        DB    lsb(sub_)    ;    -
-        DB    lsb(dot_)    ;    .
-        DB    lsb(div_)    ;    /	;/MOD
+        DB lsb(nop_)     ;       !            
+        DB lsb(nop_)     ;       "
+        DB lsb(nop_)     ;       #
+        DB lsb(nop_)     ;       $            
+        DB lsb(nop_)     ;       %            
+        DB lsb(nop_)     ;       &
+        DB lsb(nop_)     ;       '
+        DB lsb(nop_)     ;       (        
+        DB lsb(nop_)     ;       )
+        DB lsb(nop_)     ;       *            
+        DB lsb(nop_)     ;       +
+        DB lsb(nop_)     ;       ,            
+        DB lsb(nop_)     ;       -
+        DB lsb(nop_)     ;       .
+        DB lsb(nop_)     ;       /	;/MOD
 
         ; REPDAT 10, lsb(num_)		; 10 x repeat lsb of add to the num routine 
         LITDAT 10
-        DB    lsb(num_)     ;               
-        DB    lsb(num_)     ;               
-        DB    lsb(num_)     ;               
-        DB    lsb(num_)     ;               
-        DB    lsb(num_)     ;               
-        DB    lsb(num_)     ;               
-        DB    lsb(num_)     ;               
-        DB    lsb(num_)     ;               
-        DB    lsb(num_)     ;               
-        DB    lsb(num_)     ;               
+        DB lsb(num_)     ;               
+        DB lsb(num_)     ;               
+        DB lsb(num_)     ;               
+        DB lsb(num_)     ;               
+        DB lsb(num_)     ;               
+        DB lsb(num_)     ;               
+        DB lsb(num_)     ;               
+        DB lsb(num_)     ;               
+        DB lsb(num_)     ;               
+        DB lsb(num_)     ;               
 
         LITDAT 7
-        DB    lsb(def_)    ;    :        
-        DB    lsb(ret_)    ;    ;
-        DB    lsb(lt_)     ;    <
-        DB    lsb(eq_)     ;    =            
-        DB    lsb(gt_)     ;    >            
-        DB    lsb(key_)    ;    ?   ( -- val )  read a char from input
-        DB    lsb(fetch_)  ;    @    
+        DB lsb(nop_)     ;    :        
+        DB lsb(nop_)     ;    ;
+        DB lsb(nop_)     ;    <
+        DB lsb(nop_)     ;    =            
+        DB lsb(nop_)     ;    >            
+        DB lsb(nop_)     ;    ?   ( -- val )  read a char from input
+        DB lsb(nop_)     ;    @    
 
         ; REPDAT 26, lsb(call_)		; call a command A, B ....Z
         LITDAT 26
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
-        DB    lsb(call_)     ;               
+        DB lsb(call_)     ;  A               
+        DB lsb(call_)     ;  B               
+        DB lsb(call_)     ;  C               
+        DB lsb(call_)     ;  D               
+        DB lsb(call_)     ;  E               
+        DB lsb(call_)     ;  F               
+        DB lsb(call_)     ;  G               
+        DB lsb(call_)     ;  H               
+        DB lsb(call_)     ;  I               
+        DB lsb(call_)     ;  J               
+        DB lsb(call_)     ;  K               
+        DB lsb(call_)     ;  L               
+        DB lsb(call_)     ;  M               
+        DB lsb(call_)     ;  N               
+        DB lsb(call_)     ;  O               
+        DB lsb(call_)     ;  P               
+        DB lsb(call_)     ;  Q               
+        DB lsb(call_)     ;  R               
+        DB lsb(call_)     ;  S               
+        DB lsb(call_)     ;  T               
+        DB lsb(call_)     ;  U               
+        DB lsb(call_)     ;  V               
+        DB lsb(call_)     ;  W               
+        DB lsb(call_)     ;  X               
+        DB lsb(call_)     ;  Y               
+        DB lsb(call_)     ;  Z              
 
         LITDAT 6
-        DB    lsb(arrDef_) ;    [
-        DB    lsb(alt_)    ;    \
-        DB    lsb(arrEnd_) ;    ]
-        DB    lsb(xor_)    ;    ^
-        DB    lsb(neg_)    ;    _
-        DB    lsb(str_)    ;    `    	; for printing `hello`        
+        DB lsb(nop_)     ;    [
+        DB lsb(nop_)     ;    \
+        DB lsb(nop_)     ;    ]
+        DB lsb(nop_)     ;    ^
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    `    	; for printing `hello`        
 
         ; REPDAT 26, lsb(var_)		; a b c .....z
         LITDAT 26
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
-        DB    lsb(var_)     ;               
+        DB lsb(a_)      ;   a               
+        DB lsb(var_)    ;   b            
+        DB lsb(c_)      ;   c            
+        DB lsb(d_)      ;   d            
+        DB lsb(e_)      ;   e            
+        DB lsb(f_)      ;   f            
+        DB lsb(g_)      ;   g            
+        DB lsb(var_)    ;   h            
+        DB lsb(i_)      ;   i            
+        DB lsb(j_)      ;   j            
+        DB lsb(k_)      ;   k            
+        DB lsb(l_)      ;   l            
+        DB lsb(m_)      ;   m            
+        DB lsb(m_)      ;   n            
+        DB lsb(o_)      ;   o            
+        DB lsb(p_)      ;   p            
+        DB lsb(var_)    ;   q            
+        DB lsb(r_)      ;   r            
+        DB lsb(s_)      ;   s            
+        DB lsb(var_)    ;   t            
+        DB lsb(u_)      ;   u            
+        DB lsb(var_)    ;   v            
+        DB lsb(w_)      ;   w            
+        DB lsb(x_)      ;   x            
+        DB lsb(var_)    ;   y            
+        DB lsb(var_)    ;   z            
 
         LITDAT 5
-        DB    lsb(shl_)    ;    {
-        DB    lsb(or_)     ;    |            
-        DB    lsb(shr_)    ;    }            
-        DB    lsb(rot_)    ;    ~ ( a b c -- b c a ) rotate            
-        DB    lsb(nop_)    ;    DEL	; eg 10000()
+        DB lsb(nop_)    ;    {
+        DB lsb(nop_)     ;    |            
+        DB lsb(nop_)    ;    }            
+        DB lsb(nop_)    ;    ~ ( a b c -- b c a ) rotate            
+        DB lsb(nop_)    ;    DEL	; eg 10000()
 
-        LITDAT 17
-        DB     lsb(EMPTY)       ; NUL ^@        
-        DB     lsb(EMPTY)       ; SOH ^A  1
-        DB     lsb(toggleBase_) ; STX ^B  2
-        DB     lsb(EMPTY)       ; ETX ^C  3
-        DB     lsb(EMPTY)       ; EOT ^D  4
-        DB     lsb(edit_)       ; ENQ ^E  5
-        DB     lsb(EMPTY)       ; ACK ^F  6
-        DB     lsb(EMPTY)       ; BEL ^G  7 
-        DB     lsb(backsp_)     ; BS  ^H  8
-        DB     lsb(EMPTY)       ; TAB ^I  9
-        DB     lsb(reedit_)     ; LF  ^J 10
-        DB     lsb(EMPTY)       ; VT  ^K 11
-        DB     lsb(list_)       ; FF  ^L 12
-        DB     lsb(EMPTY)       ; CR  ^M 13
-        DB     lsb(EMPTY)       ; SO  ^N 14
-        DB     lsb(EMPTY)       ; SI  ^O 15
-        DB     lsb(printStack_) ; DLE ^P 16
-
-        ; REPDAT 15, lsb(EMPTY)
-        LITDAT 15
-        DB    lsb(EMPTY)    ;               
-        DB    lsb(EMPTY)    ;               
-        DB    lsb(EMPTY)    ;               
-        DB    lsb(EMPTY)    ;               
-        DB    lsb(EMPTY)    ;               
-        DB    lsb(EMPTY)    ;               
-        DB    lsb(EMPTY)    ;               
-        DB    lsb(EMPTY)    ;               
-        DB    lsb(EMPTY)    ;               
-        DB    lsb(EMPTY)    ;               
-        DB    lsb(EMPTY)    ;               
-        DB    lsb(EMPTY)    ;               
-        DB    lsb(EMPTY)    ;               
-        DB    lsb(EMPTY)    ;               
-        DB    lsb(EMPTY)    ;               
+        LITDAT 32
+        DB lsb(EMPTY)       ; NUL ^@        
+        DB lsb(EMPTY)       ; SOH ^A  1
+        DB lsb(EMPTY)       ; STX ^B  2
+        DB lsb(EMPTY)       ; ETX ^C  3
+        DB lsb(EMPTY)       ; EOT ^D  4
+        DB lsb(EMPTY)       ; ENQ ^E  5
+        DB lsb(EMPTY)       ; ACK ^F  6
+        DB lsb(EMPTY)       ; BEL ^G  7 
+        DB lsb(EMPTY)       ; BS  ^H  8
+        DB lsb(EMPTY)       ; TAB ^I  9
+        DB lsb(EMPTY)       ; LF  ^J 10
+        DB lsb(EMPTY)       ; VT  ^K 11
+        DB lsb(EMPTY)       ; FF  ^L 12
+        DB lsb(EMPTY)       ; CR  ^M 13
+        DB lsb(EMPTY)       ; SO  ^N 14
+        DB lsb(EMPTY)       ; SI  ^O 15
+        DB lsb(EMPTY)       ; DLE ^P 16
+        DB lsb(EMPTY)       ; ^Q               
+        DB lsb(EMPTY)       ; ^R               
+        DB lsb(EMPTY)       ; ^S             
+        DB lsb(EMPTY)       ; ^T             
+        DB lsb(EMPTY)       ; ^U                
+        DB lsb(EMPTY)       ; ^V            
+        DB lsb(EMPTY)       ; ^W             
+        DB lsb(EMPTY)       ; ^X              
+        DB lsb(EMPTY)       ; ^Y             
+        DB lsb(EMPTY)       ; ^Z             
+        DB lsb(EMPTY)       ; ^[            
+        DB lsb(EMPTY)       ; ^\            
+        DB lsb(EMPTY)       ; ^]            
+        DB lsb(EMPTY)       ; ^^            
+        DB lsb(EMPTY)       ; ^_            
 
         LITDAT 5
-        DB     lsb(aNop_)       ;a0    SP  				;space
-        DB     lsb(aNop_)       ;a1    \!       			; this is a bug shud be lsb(cstore_)     
-        DB     lsb(aNop_)       ;a2    \"  				
-        DB     lsb(util_)       ;a3    \#  utility command		; table of special routines ie #5 etc				
-        DB     lsb(newln_)      ;a4    \$  prints a newline to output	
+        DB lsb(aNop_)       ;a0    SP  				;space
+        DB lsb(aNop_)       ;a1    \!       			; this is a bug shud be lsb(cstore_)     
+        DB lsb(aNop_)       ;a2    \"  				
+        DB lsb(aNop_)       ;a3    \#  utility command		; table of special routines ie #5 etc				
+        DB lsb(aNop_)       ;a4    \$  prints a newline to output	
 
         ; REPDAT 3, lsb(aNop_)
         LITDAT 3
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
+        DB lsb(aNop_)       ;               
+        DB lsb(aNop_)       ;               
+        DB lsb(aNop_)       ;               
 
         LITDAT 8
-        DB     lsb(aNop_)       ;a8    \(  ( b -- )              
-        DB     lsb(aNop_)       ;a9    \)                
-        DB     lsb(aNop_)       ;aa    \*                
-        DB     lsb(aNop_)       ;ab    \+                
-        DB     lsb(emit_)       ;ac    \,  ( b -- ) prints a char              
-        DB     lsb(aNop_)       ;ad    \-                
-        DB     lsb(prnStr_)     ;ae    \.  ( b -- ) prints a string from add term by null char             
-        DB     lsb(aNop_)       ;af    \/                
+        DB lsb(aNop_)       ;a8    \(  ( b -- )              
+        DB lsb(aNop_)       ;a9    \)                
+        DB lsb(aNop_)       ;aa    \*                
+        DB lsb(aNop_)       ;ab    \+                
+        DB lsb(aNop_)       ;ac    \,  ( b -- ) prints a char              
+        DB lsb(aNop_)       ;ad    \-                
+        DB lsb(aNop_)       ;ae    \.  ( b -- ) prints a string from add term by null char             
+        DB lsb(aNop_)       ;af    \/                
 
         ; REPDAT 10, lsb(aNop_)
         LITDAT 10
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
 
         LITDAT 7
-        DB     lsb(anonDef_)    ;ba    \:	return add of a anon def, \: 1 2 3;    \\ ret add of this                
-        DB     lsb(aNop_)       ;bb    \;                
-        DB     lsb(inPort_)     ;bc    \<  ( port -- val )
-        DB     lsb(aNop_)       ;bd    \=    
-        DB     lsb(outPort_)    ;be    \>  ( val port -- )
-        DB     lsb(aNop_)       ;bf    \?
-        DB     lsb(cFetch_)     ;c0    \@      byte fetch
+        DB lsb(aNop_)    ;ba    \:	return add of a anon def, \: 1 2 3;    \\ ret add of this                
+        DB lsb(aNop_)       ;bb    \;                
+        DB lsb(aNop_)       ;bc    \<  ( port -- val )
+        DB lsb(aNop_)       ;bd    \=    
+        DB lsb(aNop_)       ;be    \>  ( val port -- )
+        DB lsb(aNop_)       ;bf    \?
+        DB lsb(aNop_)     ;c0    \@      byte fetch
 
         ; REPDAT 26, lsb(aNop_)
         LITDAT 26
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
-        DB    lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
+        DB lsb(aNop_)    ;               
 
         LITDAT 6
-        DB     lsb(cArrDef_)    ;db     \[
-        DB     lsb(comment_)    ;dc     \\  comment text, skips reading until end of line
-        DB     lsb(aNop_)       ;dd     \]
-        DB     lsb(go_)         ;de     \^  ( -- ? ) execute SCAN definition a is address of SCAN code
-        DB     lsb(eret_)       ;       \_  ( b -- ) conditional early return - stop everything           
-        DB     lsb(strDef_)     ;e0     \`  ( -- adr ) defines a string \` string ` then use \. to prt            
+        DB lsb(aNop_)   ;     \[
+        DB lsb(aNop_)   ;     \\  comment text, skips reading until end of line
+        DB lsb(aNop_)   ;     \]
+        DB lsb(aNop_)   ;     \^  ( -- ? ) execute SCAN definition a is address of SCAN code
+        DB lsb(aNop_)   ;       \_  ( b -- ) conditional early return - stop everything           
+        DB lsb(aNop_)   ;     \`  ( -- adr ) defines a string \` string ` then use \. to prt            
 
         ; REPDAT 8, lsb(altVar_)  ;e1	\a...\h
         LITDAT 8
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
     
         LITDAT 2
-        DB     lsb(i_)          ;e9    i  ; returns index variable of current loop          
-        DB     lsb(j_)          ;e9    j  ; returns index variable of outer loop     \i+6     
+        DB lsb(aNop_)   ; returns index variable of current loop          
+        DB lsb(aNop_)   ; returns index variable of outer loop     \i+6     
 
         ; REPDAT 16, lsb(altVar_)		; \k...\z
         LITDAT 16
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
-        DB      lsb(altVar_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
+        DB lsb(aNop_)
 
         LITDAT 5
-        DB    lsb(rpop_)        ;       { ( -- n ) pop from SCAN return stack 
-        DB    lsb(aNop_)        ;                  
-        DB    lsb(rpush_)       ;       } ( n -- ) push to return stack           
-        DB    lsb(break_)       ;       ~ ( b -- ) conditional break from loop            
-        DB    lsb(aNop_)        ;       DEL
+        DB lsb(aNop_)        ;       { ( -- n ) pop from SCAN return stack 
+        DB lsb(aNop_)        ;                  
+        DB lsb(aNop_)       ;       } ( n -- ) push to return stack           
+        DB lsb(aNop_)       ;       ~ ( b -- ) conditional break from loop            
+        DB lsb(aNop_)        ;       DEL
 
         ENDDAT 
 
@@ -411,9 +409,9 @@ etx1:
         JR interpret
 
 start:
-        LD SP,DSTACK		; start of SCAN
-        CALL init		; setups
-        CALL printStr		; prog count to stack, put code line 235 on stack then call print
+        LD SP,DSTACK		    ; start of SCAN
+        CALL init		        ; setups
+        CALL printStr		    ; prog count to stack, put code line 235 on stack then call print
         .cstr "SCAN V0.0\r\n"
 
 interpret:
@@ -725,6 +723,102 @@ nesting4:
         .align $100
 page4:
 
+a_:
+        INC BC
+        LD A,(BC)
+        CP 'd'              
+        JP,Z add_
+        CP 'n'              
+        JP,Z and_
+        DEC BC
+        JP var_
+        
+
+c_:
+        INC BC
+        LD A,(BC)
+        CP 'a'              
+        JP,Z case_
+        CP 'l'              
+        JP,Z closure_
+        DEC BC
+        JP var_
+        
+d_:
+        INC BC
+        LD A,(BC)
+        CP 'e'              
+        JP,Z def_
+        CP 'i'              
+        JP,Z div_
+        CP 'r'              
+        JP,Z drop_
+        CP 'u'              
+        JP,Z dup_
+        DEC BC
+        JP var_
+
+e_:
+        INC BC
+        LD A,(BC)
+        CP 'q'              
+        JP,Z eq_
+        JP var_
+
+f_:
+:filter :fi
+:fold   :fo
+
+g_:
+:get    :ge
+:go     :go             jump to address (interpret)
+:gt     :gt           
+
+i_:
+:if     :if
+:inv    :in
+
+j_:
+k_:
+:key    :k
+
+l_:
+:let    :le
+:lt     :lt
+
+m_:
+:map    :ma
+:mul    :mu
+
+n_:
+:neg    :n
+
+o_:
+:over   :ov
+:or     :or           
+
+p_:
+:print  :p
+
+r_:
+:rot    :r        
+
+s_:
+:set    :se
+:shl    :shl
+:shr    :shr
+:sub    :su
+:swap   :sw
+
+u_:
+:undrop :u
+
+w_:
+:while  :w
+
+x_:
+:xor    :x
+
 and_:        
         POP     DE          ;     Bitwise AND the top 2 elements of the stack
         POP     HL          ;    
@@ -771,19 +865,6 @@ add_:                           ; Add the top 2 members of the stack
         PUSH    HL                 
         JP (IY)              
                                  
-again_: JP again		; close loop
-
-arrDef_:    
-arrDef:                         ;=18
-        LD A,FALSE
-arrDef1:      
-        LD IY,compNEXT
-        LD (vByteMode),A
-        LD HL,(vHeapPtr)        ; HL = heap ptr
-        CALL rpush              ; save start of array \[  \]
-        JP NEXT                 ; hardwired to NEXT
-
-
 call_:
         LD A,(BC)
         CALL lookupRef1
@@ -895,8 +976,7 @@ store_:                         ; Store the value at the address placed on the t
         LD (HL),D          
         JP (IY)            
                                   
-; $ swap                        ; a b -- b a Swap the top 2 elements of the stack
-swap_:        
+swap_:                      ; a b -- b a Swap the top 2 elements of the stack
         POP HL
         EX (SP),HL
         PUSH HL
@@ -938,7 +1018,7 @@ lt_:
 cmp_:   
         AND A              ; reset the carry flag
         SBC HL,DE          ; only equality sets HL=0 here
-	JR Z,less          ; equality returns 0  KB 25/11/21
+	    JR Z,less          ; equality returns 0  KB 25/11/21
         LD HL, 0
         JP M,less
 equal:  
@@ -946,103 +1026,40 @@ equal:
 less:     
         PUSH HL
         JP (IY) 
-        
+
 var_:
         LD A,(BC)
         CALL lookupRef2
         PUSH HL
         JP (IY)
-
+        
 num_:   JP  num
-str_:   JR str                      
-arrEnd_:JR arrEnd
-def_:   JR def
+lambda_:   
+        JR lambda
 div_:   JR div
-begin_: JR begin
 
-alt_:   
 
 ;*******************************************************************
 ; Page 5 primitive routines 
 ;*******************************************************************
         ;falls through 
-alt:                                ;=11
-        INC BC
-        LD A,(BC)
-        LD HL,altCodes
-        ADD A,L
-        LD L,A
-alt2:
-        LD A,(HL)                   ;       get low jump address
-        LD HL,(vAltPage)
-        LD L,A                      
-        JP (HL)                     ;       Jump to routine
 
-
-str:                                ;=15                      
-        INC BC
-        
-str1:            
-        LD A, (BC)
-        INC BC
-        CP "`"                      ; ` is the string terminator
-        JR Z,str2
-        CALL putchar
-        JR str1
-
-str2:  
-        DEC BC
-        JP   (IY) 
-
-
-arrEnd:                             ;=27
-        CALL rpop                   ; DE = start of array
         PUSH HL
-        EX DE,HL
-        LD HL,(vHeapPtr)            ; HL = heap ptr
-        OR A
-        SBC HL,DE                   ; bytes on heap 
-        LD A,(vByteMode)
-        OR A
-        JR NZ,arrEnd2
-        SRL H                       ; BC = m words
-        RR L
-arrEnd2:
-        PUSH HL 
-        LD IY,NEXT
-        JP (IY)                     ; hardwired to NEXT
+        JP (IY)
 
-
-; **************************************************************************             
-; def is used to create a colon definition
-; When a colon is detected, the next character (usually uppercase alpha)
-; is looked up in the vector table to get its associated code field address
-; This CFA is updated to point to the character after uppercase alpha
-; The remainder of the characters are then skipped until after a semicolon  
-; is found.
-; ***************************************************************************
-
-def:                                ; Create a colon definition
+lambda:                             ;=         
         INC BC
-        LD  A,(BC)                  ; Get the next character
-        LD (vLastDef),A
-        CALL lookupRef
         LD DE,(vHeapPtr)            ; start of defintion
-        LD (HL),E                   ; Save low byte of address in CFA
-        INC HL              
-        LD (HL),D                   ; Save high byte of address in CFA+1
-        INC BC
-def1:                               ; Skip to end of definition   
+        PUSH DE
+lambda1:                                    ; Skip to end of definition   
         LD A,(BC)                   ; Get the next character
         INC BC                      ; Point to next character
         LD (DE),A
         INC DE
-        CP ";"                      ; Is it a semicolon 
-        JR Z, def2                  ; end the definition
-        JR  def1                    ; get the next element
-def2:    
+        CP ")"                      ; Is it a semicolon 
+        JR NZ, lambda1              ; get the next element
+lambda2:    
         DEC BC
-def3:
         LD (vHeapPtr),DE            ; bump heap ptr to after definiton
         JP (IY)       
 
@@ -1093,110 +1110,15 @@ div4:
         JP (IY)
 
         	                    ;=57                     
-begin:                              ; Left parentheses begins a loop
-        POP HL
-        LD A,L                      ; zero?
-        OR H
-        JR Z,begin1
-        PUSH IX
-        LD IX,(vLoopSP)
-        LD DE,-6
-        ADD IX,DE
-        LD (IX+0),0                 ; loop var
-        LD (IX+1),0                 
-        LD (IX+2),L                 ; loop limit
-        LD (IX+3),H                 
-        LD (IX+4),C                 ; loop address
-        LD (IX+5),B                 
-        LD (vLoopSP),IX
-        POP IX
-        JP (IY)
-begin1:
-        LD E,1
-begin2:
-        INC BC
-        LD A,(BC)
-        CALL nesting
-        XOR A
-        OR E
-        JR NZ,begin2
-        LD HL,1
-begin3:
-        INC BC
-        LD A,(BC)
-        DEC BC
-        CP "("
-        JR NZ,begin4
-        PUSH HL
-begin4:        
-        JP (IY)
 
-again:                              ;=72
-        PUSH IX
-        LD IX,(vLoopSP)
-        LD E,(IX+0)                 ; peek loop var
-        LD D,(IX+1)                 
-        LD L,(IX+2)                 ; peek loop limit
-        LD H,(IX+3)                 
-        DEC HL
-        OR A
-        SBC HL,DE
-        JR Z,again2
-        INC DE
-        LD (IX+0),E                 ; poke loop var
-        LD (IX+1),D                 
-again1:
-        LD C,(IX+4)                 ; peek loop address
-        LD B,(IX+5)                 
-        JR again4
-again2:   
-        LD DE,6                     ; drop loop frame
-again3:
-        ADD IX,DE
-again4:
-        LD (vLoopSP),IX
-        POP IX
-        LD HL,0                     ; skip ELSE clause
-        JR begin3               
-        
-        
 ; **************************************************************************
 ; Page 6 Alt primitives
 ; **************************************************************************
         .align $100
 page6:
 
-
-altVar_:
-        LD A,(BC)
-        SUB "a" - ((altVars - mintVars)/2) 
-        ADD A,A
-        LD H,msb(mintVars)
-        LD L,A
-        PUSH HL
 anop_:
         JP (IY)                    
-
-anonDef_:                           ;= 7        
-        INC BC
-        LD DE,(vHeapPtr)            ; start of defintion
-        PUSH DE
-        JP def1
-
-break_:
-        POP HL
-        LD A,L                      ; zero?
-        OR H
-        JR NZ,break1
-        JP (IY)
-break1:
-        LD DE,6                     ; drop loop frame
-        ADD IX,DE
-        JP begin1                   ; skip to end of loop        
-
-cArrDef_:                           ; define a byte array
-        LD A,TRUE
-        JP arrDef1
 
 cFetch_:
         POP     HL          
@@ -1251,7 +1173,7 @@ prompt_:
         JP (IY)
 
 
-go_:				    ;\^
+go_:				                ;\^
         POP DE
 go1:
         LD A,D                      ; skip if destination address is null
@@ -1279,18 +1201,6 @@ inPort_:			    ; \<
         PUSH HL
         JP (IY)        
 
-i_:
-        LD HL,(vLoopSP)
-        PUSH HL
-        JP (IY)
-
-j_:                                 ;=9  
-        LD HL,(vLoopSP)             ;the address of j is 6 bytes more than i
-        LD DE,6
-        ADD HL,DE
-        PUSH HL
-        JP (IY)
-        
 newln_:
         call crlf
         JP (IY)        
@@ -1323,52 +1233,6 @@ rpop_:
 
 aDup_:
         JP dup_
-eret_:
-        POP HL
-        LD A,L
-        OR H
-        JP NZ,ret_
-        JP (IY)
-
-strDef_:
-        JR strDef
-
-unloop_:                        ;=  ( n -- ) unloop  loop frames (n < 64)
-        POP DE                  ; DE = num frames              
-        SLA E                   ; E' = E * 2
-        LD A,E                  ; A = E'
-        SLA E                   ; E'' = E' * 2
-        ADD A,E                 ; A = num frames * 6 
-        LD E,A                  ; D = 0, DE = num frames * 6
-        LD HL,(vLoopSP)         ; HL = loop stack ptr
-        ADD HL,DE               ; pop frames
-        LD (vLoopSP),HL
-        JP (IY)
-
-; **************************************************************************
-; utilTable and util_ MUST be on the same page, assumes same msb  
-; **************************************************************************
-			    								;\#1... for machine code
-utilTable:
-        DB lsb(exec_)       ;\#0    ( adr -- )    if not null execute code at adr
-        DB lsb(eret_)       ;\#1    ( b -- )      conditional early return  
-        DB lsb(unloop_)     ;\#2    ( n -- )      pop n loop frames from loop stack
-        DB lsb(depth_)      ;\#3    ( -- val )    depth of data stack  
-        DB lsb(printStk_)   ;\#4    ( -- )        non-destructively prints stack
-        DB lsb(prompt_)     ;\#5    ( -- )        print SCAN prompt 
-        DB lsb(editDef_)    ;\#6    ( char -- )   edit command    
-        DB lsb(aDup_)       ;\#7    ( adr -- )    dupe (used in asm tests)
-
-util_:
-util:                           ;= 13
-        INC BC
-        LD A,(BC)
-        SUB "0"
-        LD L,lsb(utilTable)     ; H already contains msb(page6)
-        ADD A,L
-        LD L,A
-        LD L,(HL)               ; H already contains msb(page6)
-        JP (HL)
 
 printStk_:
 
@@ -1399,7 +1263,8 @@ strDef2:
         XOR A                   ; write null to terminate string
         LD (DE),A
         INC DE
-        JP def3
+        LD (vHeapPtr),DE            ; bump heap ptr to after definiton
+        JP (IY)       
 
 ;*******************************************************************
 ; Page 5 primitive routines continued
