@@ -20,7 +20,7 @@ testsStart:
     ; .cstr "Done!!\r\n"
     ; HALT
 
-    test "1", 1
+    ; test "1", 1
     ; test "1", 1
     ; test "0", 0
     ; test "10", 10

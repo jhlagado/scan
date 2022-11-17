@@ -58,22 +58,6 @@ macros:
 ;                                           	;the space between the \b is to over write
 ;                                             	;
 	
-; reedit_:
-;         DB "\\e\\@\\#6;"			; remembers last line edited
-
-; edit_:
-;         .cstr "`?`?\\#5\\#6;"
-
-; list_:
-;         .cstr "\\$26(\\i@65+\\#6\\c@0>(\\$))\\#5;"
-
-; printStack_:
-;         .cstr "\\#4\\#5;"        
-
-; toggleBase_:
-;         .cstr "\\b@0=\\b!;"
-
-
 ; ***********************************************************************
 ; Initial values for user mintVars		
 ; ***********************************************************************		
@@ -207,32 +191,58 @@ iOpcodes:
 
         ; REPDAT 26, lsb(var_)		; a b c .....z
         LITDAT 26
-        DB lsb(a_)      ;   a               
-        DB lsb(var_)    ;   b            
-        DB lsb(c_)      ;   c            
-        DB lsb(d_)      ;   d            
-        DB lsb(e_)      ;   e            
-        DB lsb(f_)      ;   f            
-        DB lsb(g_)      ;   g            
-        DB lsb(var_)    ;   h            
-        DB lsb(i_)      ;   i            
-        DB lsb(var_)    ;   j            
-        DB lsb(k_)      ;   k            
-        DB lsb(l_)      ;   l            
-        DB lsb(m_)      ;   m            
-        DB lsb(m_)      ;   n            
-        DB lsb(o_)      ;   o            
-        DB lsb(p_)      ;   p            
-        DB lsb(var_)    ;   q            
-        DB lsb(r_)      ;   r            
-        DB lsb(s_)      ;   s            
-        DB lsb(var_)    ;   t            
-        DB lsb(u_)      ;   u            
-        DB lsb(var_)    ;   v            
-        DB lsb(w_)      ;   w            
-        DB lsb(x_)      ;   x            
-        DB lsb(var_)    ;   y            
-        DB lsb(var_)    ;   z            
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        DB lsb(nop_)     ;    _
+        ; DB lsb(a_)      ;   a               
+        ; DB lsb(var_)    ;   b            
+        ; DB lsb(c_)      ;   c            
+        ; DB lsb(d_)      ;   d            
+        ; DB lsb(e_)      ;   e            
+        ; DB lsb(f_)      ;   f            
+        ; DB lsb(g_)      ;   g            
+        ; DB lsb(var_)    ;   h            
+        ; DB lsb(i_)      ;   i            
+        ; DB lsb(var_)    ;   j            
+        ; DB lsb(k_)      ;   k            
+        ; DB lsb(l_)      ;   l            
+        ; DB lsb(m_)      ;   m            
+        ; DB lsb(m_)      ;   n            
+        ; DB lsb(o_)      ;   o            
+        ; DB lsb(p_)      ;   p            
+        ; DB lsb(var_)    ;   q            
+        ; DB lsb(r_)      ;   r            
+        ; DB lsb(s_)      ;   s            
+        ; DB lsb(var_)    ;   t            
+        ; DB lsb(u_)      ;   u            
+        ; DB lsb(var_)    ;   v            
+        ; DB lsb(w_)      ;   w            
+        ; DB lsb(x_)      ;   x            
+        ; DB lsb(var_)    ;   y            
+        ; DB lsb(var_)    ;   z            
 
         LITDAT 5
         DB lsb(nop_)    ;    {
@@ -778,7 +788,6 @@ c:
         DEC BC
         JP var_
         
-
 d:        
         INC BC
         LD A,(BC)
@@ -885,9 +894,6 @@ p:
         JP Z,print_
         DEC BC
         JP var_
-
-r_:
-        JP r
 r:
         INC BC
         LD A,(BC)
@@ -939,92 +945,19 @@ x:
 case_:
 closure_:
 def_:
+filter_:
 get_:
 if_:
-filter_:
-
-
-        JP Z,inv_
-        DEC BC
-        JP var_
-
-k:
-        JP x
-        INC BC
-        LD A,(BC)
-        CP 'e'              
-        JP Z,key_
-        DEC BC
-        JP var_
-
-l:
-        INC BC
-        LD A,(BC)
-        CP 'e'              
-        JP Z,let_
-        CP 't'              
-        JP Z,lt_
-        DEC BC
-        JP var_
-
-m:
-        INC BC
-        LD A,(BC)
-        CP 'a'              
-        JP Z,map_
-        CP 'u'              
-        JP Z,mul_
-        DEC BC
-        JP var_
-
-n:
-        INC BC
-        LD A,(BC)
-        CP 'e'              
-        JP Z,neg_
-        DEC BC
-        JP var_
-
-o:
-        INC BC
-        LD A,(BC)
-        CP 'v'              
-        JP Z,over_
-        CP 'r'              
-        JP Z,or_
-        DEC BC
-        JP var_
-
-p:
-        INC BC
-        LD A,(BC)
-        CP 'r'              
-        JP Z,print_
-        DEC BC
-        JP var_
-
-r_:
-        JP r
-r:
-        INC BC
-        LD A,(BC)
-        CP 'o'              
-        JP Z,rot_
-        DEC BC
-        JP Z,scan_
-        JP Z,set_
-        JP Z,shift_
-        JP Z,sub_
-        JP Z,swap_
-        JP Z,undrop_
-        JP Z,while_
-        JP Z,xor_
-
-
-
-
+let_:
+map_:
+print_:
 scan_:
-        JP IY
+set_:
+shift_:
+undrop_:
+while_:
+
+        JP (IY)
 
 and_:        
         POP     DE          ;     Bitwise AND the top 2 elements of the stack
@@ -1362,19 +1295,6 @@ exec1:
         EX (SP),HL
         JP (HL)
 
-depth_:
-        LD HL,0
-        ADD HL,SP
-        EX DE,HL
-        LD HL,DSTACK
-        OR A
-        SBC HL,DE
-        JP shr1
-
-editDef_:
-        call editDef
-        JP (IY)
-
 prompt_:
         CALL prompt
         JP (IY)
@@ -1438,40 +1358,11 @@ rpop_:
         PUSH HL
         JP (IY)
 
-aDup_:
-        JP dup_
-
-printStk_:
-
 ; **************************************************************************
 ; Page 6 primitive routines continued  (page 7) 
 ; **************************************************************************
         ; falls through to following page
         
-printStk:                           ;=40
-        ; SCAN: \a@2- \#3 1- ("@ \b@ \(,)(.) 2-) '             
-        call ENTER
-        .cstr "`=> `\\a@2-\\#3 1-(",$22,"@\\b@(,)(.)2-)'\\$"             
-        JP (IY)
-
-strDef:                         ;= 21
-        LD DE,(vHeapPtr)        ; HL = heap ptr
-        PUSH DE                 ; save start of string 
-        INC BC                  ; point to next char
-        JR strDef2
-strDef1:
-        LD (DE),A
-        INC DE                  ; increase count
-        INC BC                  ; point to next char
-strDef2:
-        LD A,(BC)
-        CP "`"                  ; ` is the string terminator
-        JR NZ,strDef1
-        XOR A                   ; write null to terminate string
-        LD (DE),A
-        INC DE
-        LD (vHeapPtr),DE            ; bump heap ptr to after definiton
-        JP (IY)       
 
 ;*******************************************************************
 ; Page 5 primitive routines continued
@@ -1602,43 +1493,6 @@ rpop:                               ;=11
         INC IX                  
 rpop2:
         RET
-
-editDef:                            ;=50 lookup up def based on number
-        POP HL                      ; pop ret address
-        EX (SP),HL                  ; swap with TOS                  
-        LD A,L
-        EX AF,AF'
-        LD A,L
-        CALL lookupRef
-        LD E,(HL)
-        INC HL
-        LD D,(HL)
-        LD A,D
-        OR E
-        LD HL,TIB
-        JR Z,editDef3
-        LD A,":"
-        CALL writeChar
-        EX AF,AF'
-        CALL writeChar
-        JR editDef2
-editDef1:
-        INC DE
-editDef2:        
-        LD A,(DE)
-        CALL writeChar
-        CP ";"
-        JR NZ,editDef1
-editDef3:        
-        LD DE,TIB
-        OR A
-        SBC HL,DE
-        LD (vTIBPtr),HL
-        RET
-writeChar:                          ;=5
-        LD (HL),A
-        INC HL
-        JP putchar
 
 crlf:                               ;=7
         call printStr
