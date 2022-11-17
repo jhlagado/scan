@@ -216,7 +216,7 @@ iOpcodes:
         DB lsb(g_)      ;   g            
         DB lsb(var_)    ;   h            
         DB lsb(i_)      ;   i            
-        DB lsb(j_)      ;   j            
+        DB lsb(var_)    ;   j            
         DB lsb(k_)      ;   k            
         DB lsb(l_)      ;   l            
         DB lsb(m_)      ;   m            
@@ -724,100 +724,307 @@ nesting4:
 page4:
 
 a_:
+        JP a
+c_:
+        JP c
+d_:
+        JP d
+e_:
+        JP e
+f_:
+        JP f
+g_:
+        JP g
+i_:
+        JP i
+k_:
+        JP k
+l_:
+        JP l
+m_:
+        JP m
+n_:
+        JP n
+o_:
+        JP o
+p_:
+        JP p
+s_:
+        JP s
+u_:
+        JP u
+w_:
+        JP w
+x_:
+        JP x
+        
+a:
         INC BC
         LD A,(BC)
         CP 'd'              
-        JP,Z add_
+        JP Z,add_
         CP 'n'              
-        JP,Z and_
+        JP Z,and_
         DEC BC
         JP var_
         
-
-c_:
+c:        
         INC BC
         LD A,(BC)
         CP 'a'              
-        JP,Z case_
+        JP Z,case_
         CP 'l'              
-        JP,Z closure_
+        JP Z,closure_
         DEC BC
         JP var_
         
-d_:
+
+d:        
         INC BC
         LD A,(BC)
         CP 'e'              
-        JP,Z def_
+        JP Z,def_
         CP 'i'              
-        JP,Z div_
+        JP Z,div_
         CP 'r'              
-        JP,Z drop_
+        JP Z,drop_
         CP 'u'              
-        JP,Z dup_
+        JP Z,dup_
         DEC BC
         JP var_
 
-e_:
+e:
         INC BC
         LD A,(BC)
         CP 'q'              
-        JP,Z eq_
+        JP Z,eq_
+        DEC BC
         JP var_
 
-f_:
-:filter :fi
-:fold   :fo
+f:
+        INC BC
+        LD A,(BC)
+        CP 'i'              
+        JP Z,filter_
+        DEC BC
+        JP var_
 
-g_:
-:get    :ge
-:go     :go             jump to address (interpret)
-:gt     :gt           
+g:
+        INC BC
+        LD A,(BC)
+        CP 'e'              
+        JP Z,get_
+        CP 'o'              
+        JP Z,go_
+        CP 't'              
+        JP Z,gt_
+        DEC BC
+        JP var_
 
-i_:
-:if     :if
-:inv    :in
+i:
+        INC BC
+        LD A,(BC)
+        CP 'f'              
+        JP Z,if_
+        CP 'n'              
+        JP Z,inv_
+        DEC BC
+        JP var_
 
-j_:
-k_:
-:key    :k
+k:
+        JP x
+        INC BC
+        LD A,(BC)
+        CP 'e'              
+        JP Z,key_
+        DEC BC
+        JP var_
 
-l_:
-:let    :le
-:lt     :lt
+l:
+        INC BC
+        LD A,(BC)
+        CP 'e'              
+        JP Z,let_
+        CP 't'              
+        JP Z,lt_
+        DEC BC
+        JP var_
 
-m_:
-:map    :ma
-:mul    :mu
+m:
+        INC BC
+        LD A,(BC)
+        CP 'a'              
+        JP Z,map_
+        CP 'u'              
+        JP Z,mul_
+        DEC BC
+        JP var_
 
-n_:
-:neg    :n
+n:
+        INC BC
+        LD A,(BC)
+        CP 'e'              
+        JP Z,neg_
+        DEC BC
+        JP var_
 
-o_:
-:over   :ov
-:or     :or           
+o:
+        INC BC
+        LD A,(BC)
+        CP 'v'              
+        JP Z,over_
+        CP 'r'              
+        JP Z,or_
+        DEC BC
+        JP var_
 
-p_:
-:print  :p
+p:
+        INC BC
+        LD A,(BC)
+        CP 'r'              
+        JP Z,print_
+        DEC BC
+        JP var_
 
 r_:
-:rot    :r        
+        JP r
+r:
+        INC BC
+        LD A,(BC)
+        CP 'o'              
+        JP Z,rot_
+        DEC BC
+        JP var_
 
-s_:
-:set    :se
-:shl    :shl
-:shr    :shr
-:sub    :su
-:swap   :sw
+s:
+        INC BC
+        LD A,(BC)
+        CP 'c'              
+        JP Z,scan_
+        CP 'e'              
+        JP Z,set_
+        CP 'h'              
+        JP Z,shift_
+        CP 'u'              
+        JP Z,sub_
+        CP 'w'              
+        JP Z,swap_
+        DEC BC
+        JP var_
 
-u_:
-:undrop :u
+u:
+        INC BC
+        LD A,(BC)
+        CP 'n'              
+        JP Z,undrop_
+        DEC BC
+        JP var_
 
-w_:
-:while  :w
+w:
+        INC BC
+        LD A,(BC)
+        CP 'h'              
+        JP Z,while_
+        DEC BC
+        JP var_
 
-x_:
-:xor    :x
+x:
+        INC BC
+        LD A,(BC)
+        CP 'x'              
+        JP Z,xor_
+        DEC BC
+        JP var_
+
+case_:
+closure_:
+def_:
+get_:
+if_:
+filter_:
+
+
+        JP Z,inv_
+        DEC BC
+        JP var_
+
+k:
+        JP x
+        INC BC
+        LD A,(BC)
+        CP 'e'              
+        JP Z,key_
+        DEC BC
+        JP var_
+
+l:
+        INC BC
+        LD A,(BC)
+        CP 'e'              
+        JP Z,let_
+        CP 't'              
+        JP Z,lt_
+        DEC BC
+        JP var_
+
+m:
+        INC BC
+        LD A,(BC)
+        CP 'a'              
+        JP Z,map_
+        CP 'u'              
+        JP Z,mul_
+        DEC BC
+        JP var_
+
+n:
+        INC BC
+        LD A,(BC)
+        CP 'e'              
+        JP Z,neg_
+        DEC BC
+        JP var_
+
+o:
+        INC BC
+        LD A,(BC)
+        CP 'v'              
+        JP Z,over_
+        CP 'r'              
+        JP Z,or_
+        DEC BC
+        JP var_
+
+p:
+        INC BC
+        LD A,(BC)
+        CP 'r'              
+        JP Z,print_
+        DEC BC
+        JP var_
+
+r_:
+        JP r
+r:
+        INC BC
+        LD A,(BC)
+        CP 'o'              
+        JP Z,rot_
+        DEC BC
+        JP Z,scan_
+        JP Z,set_
+        JP Z,shift_
+        JP Z,sub_
+        JP Z,swap_
+        JP Z,undrop_
+        JP Z,while_
+        JP Z,xor_
+
+
+
+
+scan_:
+        JP IY
 
 and_:        
         POP     DE          ;     Bitwise AND the top 2 elements of the stack
