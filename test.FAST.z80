@@ -1,4 +1,4 @@
-    ; .engine mycomputer
+    .engine mycomputer
 
     .include "constants.asm"
     .include "test.fast.mac.asm"
@@ -17,15 +17,16 @@
 testsStart:
 
     test "1", 1
-    ; test "1", 1
-    ; test "0", 0
-    ; test "10", 10
-    ; test "#10", $10
-    ; test "#FF", $FF
-    ; test "2 3 =", 0
-    ; test "3 3 =", 1
-    ; test "2 3 <", 1
+    test "0", 0
+    test "10", 10
+    test "$10", $10
+    test "$FF", $FF
+    test "2 3 =", 0
+    test "3 3 =", 1
+    test "2 3 <", 1
     ; test "3 3 <", 0
+    ; test "3 3 <=", 1
+
     ; test "3 3 >", 0
     ; test "4 3 >", 1
     ; test "1 2 +", 3

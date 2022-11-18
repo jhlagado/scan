@@ -117,7 +117,7 @@ iOpcodes:
         DB lsb(nop_)     ;       !            
         DB lsb(nop_)     ;       "
         DB lsb(nop_)     ;       #
-        DB lsb(nop_)     ;       $            
+        DB lsb(hex_)     ;       $            
         DB lsb(nop_)     ;       %            
         DB lsb(nop_)     ;       &
         DB lsb(nop_)     ;       '
@@ -132,22 +132,22 @@ iOpcodes:
 
         ; REPDAT 10, lsb(num_)		; 10 x repeat lsb of add to the num routine 
         LITDAT 10
-        DB lsb(num_)     ;               
-        DB lsb(num_)     ;               
-        DB lsb(num_)     ;               
-        DB lsb(num_)     ;               
-        DB lsb(num_)     ;               
-        DB lsb(num_)     ;               
-        DB lsb(num_)     ;               
-        DB lsb(num_)     ;               
-        DB lsb(num_)     ;               
-        DB lsb(num_)     ;               
+        DB lsb(num_)     ;  0               
+        DB lsb(num_)     ;  1             
+        DB lsb(num_)     ;  2             
+        DB lsb(num_)     ;  3             
+        DB lsb(num_)     ;  4             
+        DB lsb(num_)     ;  5             
+        DB lsb(num_)     ;  6             
+        DB lsb(num_)     ;  7             
+        DB lsb(num_)     ;  8             
+        DB lsb(num_)     ;  9             
 
         LITDAT 7
         DB lsb(nop_)     ;    :        
         DB lsb(nop_)     ;    ;
-        DB lsb(nop_)     ;    <
-        DB lsb(nop_)     ;    =            
+        DB lsb(less_)    ;    <
+        DB lsb(eq_)      ;    =            
         DB lsb(nop_)     ;    >            
         DB lsb(nop_)     ;    ?   ( -- val )  read a char from input
         DB lsb(nop_)     ;    @    
@@ -914,11 +914,22 @@ neg_:
 eq_:    
         POP HL
         POP DE
-        AND A              ; reset the carry flag
+        OR A               ; reset the carry flag
         SBC HL,DE          ; only equality sets HL=0 here
+        JR NZ, noteqx
+        
         JR Z, equal
         LD HL, 0
-        JR less           ; HL = 1    
+        JR noteq              
+equal:  
+        INC L              ; HL = 1    
+noteq:     
+        PUSH HL
+        JP (IY) 
+noteqx:
+
+        PUSH HL
+        JP (IY) 
 
 gt_:    
         POP DE
@@ -928,18 +939,13 @@ gt_:
 lt_:    
         POP HL
         POP DE
-        
 cmp_:   
-        AND A              ; reset the carry flag
+        OR A               ; reset the carry flag
         SBC HL,DE          ; only equality sets HL=0 here
-	    JR Z,less          ; equality returns 0  KB 25/11/21
+	    JR Z,noteq          ; equality returns 0  KB 25/11/21
         LD HL, 0
-        JP M,less
-equal:  
-        INC L              ; HL = 1    
-less:     
-        PUSH HL
-        JP (IY) 
+        JP M,noteq
+        JP equal
 
 var_:
         LD A,(BC)
