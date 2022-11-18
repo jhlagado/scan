@@ -191,58 +191,58 @@ iOpcodes:
 
         ; REPDAT 26, lsb(var_)		; a b c .....z
         LITDAT 26
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        DB lsb(nop_)     ;    _
-        ; DB lsb(a_)      ;   a               
-        ; DB lsb(var_)    ;   b            
-        ; DB lsb(c_)      ;   c            
-        ; DB lsb(d_)      ;   d            
-        ; DB lsb(e_)      ;   e            
-        ; DB lsb(f_)      ;   f            
-        ; DB lsb(g_)      ;   g            
-        ; DB lsb(var_)    ;   h            
-        ; DB lsb(i_)      ;   i            
-        ; DB lsb(var_)    ;   j            
-        ; DB lsb(k_)      ;   k            
-        ; DB lsb(l_)      ;   l            
-        ; DB lsb(m_)      ;   m            
-        ; DB lsb(m_)      ;   n            
-        ; DB lsb(o_)      ;   o            
-        ; DB lsb(p_)      ;   p            
-        ; DB lsb(var_)    ;   q            
-        ; DB lsb(r_)      ;   r            
-        ; DB lsb(s_)      ;   s            
-        ; DB lsb(var_)    ;   t            
-        ; DB lsb(u_)      ;   u            
-        ; DB lsb(var_)    ;   v            
-        ; DB lsb(w_)      ;   w            
-        ; DB lsb(x_)      ;   x            
-        ; DB lsb(var_)    ;   y            
-        ; DB lsb(var_)    ;   z            
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        ; DB lsb(nop_)     ;    _
+        DB lsb(a_)      ;   a               
+        DB lsb(var_)    ;   b            
+        DB lsb(c_)      ;   c            
+        DB lsb(d_)      ;   d            
+        DB lsb(e_)      ;   e            
+        DB lsb(f_)      ;   f            
+        DB lsb(g_)      ;   g            
+        DB lsb(var_)    ;   h            
+        DB lsb(i_)      ;   i            
+        DB lsb(var_)    ;   j            
+        DB lsb(k_)      ;   k            
+        DB lsb(l_)      ;   l            
+        DB lsb(m_)      ;   m            
+        DB lsb(m_)      ;   n            
+        DB lsb(o_)      ;   o            
+        DB lsb(p_)      ;   p            
+        DB lsb(var_)    ;   q            
+        DB lsb(r_)      ;   r            
+        DB lsb(s_)      ;   s            
+        DB lsb(var_)    ;   t            
+        DB lsb(u_)      ;   u            
+        DB lsb(var_)    ;   v            
+        DB lsb(w_)      ;   w            
+        DB lsb(x_)      ;   x            
+        DB lsb(var_)    ;   y            
+        DB lsb(var_)    ;   z            
 
         LITDAT 5
         DB lsb(nop_)    ;    {
@@ -733,232 +733,6 @@ nesting4:
         .align $100
 page4:
 
-a_:
-        JP a
-c_:
-        JP c
-d_:
-        JP d
-e_:
-        JP e
-f_:
-        JP f
-g_:
-        JP g
-i_:
-        JP i
-k_:
-        JP k
-l_:
-        JP l
-m_:
-        JP m
-n_:
-        JP n
-o_:
-        JP o
-p_:
-        JP p
-s_:
-        JP s
-u_:
-        JP u
-w_:
-        JP w
-x_:
-        JP x
-        
-a:
-        INC BC
-        LD A,(BC)
-        CP 'd'              
-        JP Z,add_
-        CP 'n'              
-        JP Z,and_
-        DEC BC
-        JP var_
-        
-c:        
-        INC BC
-        LD A,(BC)
-        CP 'a'              
-        JP Z,case_
-        CP 'l'              
-        JP Z,closure_
-        DEC BC
-        JP var_
-        
-d:        
-        INC BC
-        LD A,(BC)
-        CP 'e'              
-        JP Z,def_
-        CP 'i'              
-        JP Z,div_
-        CP 'r'              
-        JP Z,drop_
-        CP 'u'              
-        JP Z,dup_
-        DEC BC
-        JP var_
-
-e:
-        INC BC
-        LD A,(BC)
-        CP 'q'              
-        JP Z,eq_
-        DEC BC
-        JP var_
-
-f:
-        INC BC
-        LD A,(BC)
-        CP 'i'              
-        JP Z,filter_
-        DEC BC
-        JP var_
-
-g:
-        INC BC
-        LD A,(BC)
-        CP 'e'              
-        JP Z,get_
-        CP 'o'              
-        JP Z,go_
-        CP 't'              
-        JP Z,gt_
-        DEC BC
-        JP var_
-
-i:
-        INC BC
-        LD A,(BC)
-        CP 'f'              
-        JP Z,if_
-        CP 'n'              
-        JP Z,inv_
-        DEC BC
-        JP var_
-
-k:
-        JP x
-        INC BC
-        LD A,(BC)
-        CP 'e'              
-        JP Z,key_
-        DEC BC
-        JP var_
-
-l:
-        INC BC
-        LD A,(BC)
-        CP 'e'              
-        JP Z,let_
-        CP 't'              
-        JP Z,lt_
-        DEC BC
-        JP var_
-
-m:
-        INC BC
-        LD A,(BC)
-        CP 'a'              
-        JP Z,map_
-        CP 'u'              
-        JP Z,mul_
-        DEC BC
-        JP var_
-
-n:
-        INC BC
-        LD A,(BC)
-        CP 'e'              
-        JP Z,neg_
-        DEC BC
-        JP var_
-
-o:
-        INC BC
-        LD A,(BC)
-        CP 'v'              
-        JP Z,over_
-        CP 'r'              
-        JP Z,or_
-        DEC BC
-        JP var_
-
-p:
-        INC BC
-        LD A,(BC)
-        CP 'r'              
-        JP Z,print_
-        DEC BC
-        JP var_
-r:
-        INC BC
-        LD A,(BC)
-        CP 'o'              
-        JP Z,rot_
-        DEC BC
-        JP var_
-
-s:
-        INC BC
-        LD A,(BC)
-        CP 'c'              
-        JP Z,scan_
-        CP 'e'              
-        JP Z,set_
-        CP 'h'              
-        JP Z,shift_
-        CP 'u'              
-        JP Z,sub_
-        CP 'w'              
-        JP Z,swap_
-        DEC BC
-        JP var_
-
-u:
-        INC BC
-        LD A,(BC)
-        CP 'n'              
-        JP Z,undrop_
-        DEC BC
-        JP var_
-
-w:
-        INC BC
-        LD A,(BC)
-        CP 'h'              
-        JP Z,while_
-        DEC BC
-        JP var_
-
-x:
-        INC BC
-        LD A,(BC)
-        CP 'x'              
-        JP Z,xor_
-        DEC BC
-        JP var_
-
-case_:
-closure_:
-def_:
-filter_:
-get_:
-if_:
-let_:
-map_:
-print_:
-scan_:
-set_:
-shift_:
-undrop_:
-while_:
-
-        JP (IY)
-
 and_:        
         POP     DE          ;     Bitwise AND the top 2 elements of the stack
         POP     HL          ;    
@@ -1176,6 +950,44 @@ var_:
 num_:   JP  num
 lambda_:   
         JR lambda
+
+a_:
+        JP a
+c_:
+        JP c
+d_:
+        JP d
+e_:
+        JP e
+f_:
+        JP f
+g_:
+        JP g
+i_:
+        JP i
+k_:
+        JP k
+l_:
+        JP l
+m_:
+        JP m
+n_:
+        JP n
+o_:
+        JP o
+p_:
+        JP p
+r_:
+        JP r
+s_:
+        JP s
+u_:
+        JP u
+w_:
+        JP w
+x_:
+        JP x
+        
 div_:   JR div
 
 
@@ -1362,7 +1174,196 @@ rpop_:
 ; Page 6 primitive routines continued  (page 7) 
 ; **************************************************************************
         ; falls through to following page
+a:
+        INC BC
+        LD A,(BC)
+        CP 'd'              
+        JP Z,add_
+        CP 'n'              
+        JP Z,and_
+        DEC BC
+        JP var_
         
+c:        
+        INC BC
+        LD A,(BC)
+        CP 'a'              
+        JP Z,case_
+        CP 'l'              
+        JP Z,closure_
+        DEC BC
+        JP var_
+        
+d:        
+        INC BC
+        LD A,(BC)
+        CP 'e'              
+        JP Z,def_
+        CP 'i'              
+        JP Z,div_
+        CP 'r'              
+        JP Z,drop_
+        CP 'u'              
+        JP Z,dup_
+        DEC BC
+        JP var_
+
+e:
+        INC BC
+        LD A,(BC)
+        CP 'q'              
+        JP Z,eq_
+        DEC BC
+        JP var_
+
+f:
+        INC BC
+        LD A,(BC)
+        CP 'i'              
+        JP Z,filter_
+        DEC BC
+        JP var_
+
+g:
+        INC BC
+        LD A,(BC)
+        CP 'e'              
+        JP Z,get_
+        CP 'o'              
+        JP Z,go_
+        CP 't'              
+        JP Z,gt_
+        DEC BC
+        JP var_
+
+i:
+        INC BC
+        LD A,(BC)
+        CP 'f'              
+        JP Z,if_
+        CP 'n'              
+        JP Z,inv_
+        DEC BC
+        JP var_
+
+k:
+        JP x
+        INC BC
+        LD A,(BC)
+        CP 'e'              
+        JP Z,key_
+        DEC BC
+        JP var_
+
+l:
+        INC BC
+        LD A,(BC)
+        CP 'e'              
+        JP Z,let_
+        CP 't'              
+        JP Z,lt_
+        DEC BC
+        JP var_
+
+m:
+        INC BC
+        LD A,(BC)
+        CP 'a'              
+        JP Z,map_
+        CP 'u'              
+        JP Z,mul_
+        DEC BC
+        JP var_
+
+n:
+        INC BC
+        LD A,(BC)
+        CP 'e'              
+        JP Z,neg_
+        DEC BC
+        JP var_
+
+o:
+        INC BC
+        LD A,(BC)
+        CP 'v'              
+        JP Z,over_
+        CP 'r'              
+        JP Z,or_
+        DEC BC
+        JP var_
+
+p:
+        INC BC
+        LD A,(BC)
+        CP 'r'              
+        JP Z,print_
+        DEC BC
+        JP var_
+r:
+        INC BC
+        LD A,(BC)
+        CP 'o'              
+        JP Z,rot_
+        DEC BC
+        JP var_
+
+s:
+        INC BC
+        LD A,(BC)
+        CP 'c'              
+        JP Z,scan_
+        CP 'e'              
+        JP Z,set_
+        CP 'h'              
+        JP Z,shift_
+        CP 'u'              
+        JP Z,sub_
+        CP 'w'              
+        JP Z,swap_
+        DEC BC
+        JP var_
+
+u:
+        INC BC
+        LD A,(BC)
+        CP 'n'              
+        JP Z,undrop_
+        DEC BC
+        JP var_
+
+w:
+        INC BC
+        LD A,(BC)
+        CP 'h'              
+        JP Z,while_
+        DEC BC
+        JP var_
+
+x:
+        INC BC
+        LD A,(BC)
+        CP 'x'              
+        JP Z,xor_
+        DEC BC
+        JP var_
+
+case_:
+closure_:
+def_:
+filter_:
+get_:
+if_:
+let_:
+map_:
+print_:
+scan_:
+set_:
+shift_:
+undrop_:
+while_:
+
+        JP (IY)
 
 ;*******************************************************************
 ; Page 5 primitive routines continued
