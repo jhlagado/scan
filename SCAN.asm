@@ -146,9 +146,9 @@ iOpcodes:
         LITDAT 7
         DB lsb(nop_)     ;    :        
         DB lsb(nop_)     ;    ;
-        DB lsb(less_)    ;    <
+        DB lsb(lt_)      ;    <
         DB lsb(eq_)      ;    =            
-        DB lsb(nop_)     ;    >            
+        DB lsb(gt_)      ;    >            
         DB lsb(nop_)     ;    ?   ( -- val )  read a char from input
         DB lsb(nop_)     ;    @    
 
@@ -896,8 +896,12 @@ swap_:                      ; a b -- b a Swap the top 2 elements of the stack
         PUSH HL
         JP (IY)
         
-sub_:       		    ; Subtract the value 2nd on stack from top of stack 
-        
+neg_:   
+        LD HL, 0    		; NEGate the value on top of stack (2's complement)
+        POP DE              ;    
+        JR sub2             ; use the SUBtract routine
+    
+sub_:       		        ; Subtract the value 2nd on stack from top of stack 
         POP DE              ;    
         POP HL              ;      Entry point for INVert
 sub2:   
@@ -906,46 +910,48 @@ sub2:
         PUSH HL             ;    
         JP (IY)             ;   
                                 ; 5  
-neg_:   
-        LD HL, 0    		; NEGate the value on top of stack (2's complement)
-        POP DE                  ;    
-        JR sub2                 ; use the SUBtract routine
-    
 eq_:    
         POP HL
         POP DE
-        OR A               ; reset the carry flag
+        OR A              ; reset the carry flag
         SBC HL,DE          ; only equality sets HL=0 here
-        JR NZ, noteqx
-        
-        JR Z, equal
+        JR Z, true_
+false_:
         LD HL, 0
-        JR noteq              
-equal:  
-        INC L              ; HL = 1    
-noteq:     
-        PUSH HL
-        JP (IY) 
-noteqx:
-
         PUSH HL
         JP (IY) 
 
 gt_:    
         POP DE
         POP HL
-        JR cmp_
+        JR lt1
         
 lt_:    
         POP HL
         POP DE
-cmp_:   
-        OR A               ; reset the carry flag
-        SBC HL,DE          ; only equality sets HL=0 here
-	    JR Z,noteq          ; equality returns 0  KB 25/11/21
-        LD HL, 0
-        JP M,noteq
-        JP equal
+lt1:   
+        OR A              ; reset the carry flag
+        SBC HL,DE         
+	    JR Z,false_         
+        JP M,false_
+true_:
+        LD HL, 1
+        PUSH HL
+        JP (IY) 
+
+gte_:    
+        POP DE
+        POP HL
+        JR lte1
+lte_:    
+        POP HL
+        POP DE
+lte1:   
+        OR A              ; reset the carry flag
+        SBC HL,DE         
+        JP M,false_
+        JP true
+
 
 var_:
         LD A,(BC)
