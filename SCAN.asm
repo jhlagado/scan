@@ -105,8 +105,8 @@ iOpcodes:
         LITDAT 15
         DB lsb(nop_)    ;   !            
         DB lsb(nop_)    ;   "
-        DB lsb(nop_)    ;   #
-        DB lsb(hex_)    ;   $            
+        DB lsb(hexnum_) ;   #
+        DB lsb(nop_)    ;   $            
         DB lsb(nop_)    ;   %            
         DB lsb(and_)    ;   &
         DB lsb(nop_)    ;   '
@@ -495,7 +495,7 @@ waitchar4:
 ;
 ; *********************************************************************************
 
-NEXT:                               ;=9 
+next:                               ;=9 
         inc bc                      ;       Increment the IP
         ld a, (bc)                  ;       Get the next character and dispatch
         ld l,a                      ;       Index into table
@@ -508,7 +508,7 @@ init:                           ;=68
         ld hl,LSTACK
         ld (vLoopSP),hl         ; Loop stack pointer stored in memory
         ld ix,RSTACK
-        ld iy,NEXT		; iy provides a faster jump to NEXT
+        ld iy,next		; iy provides a faster jump to next
         ld hl,ialtVars
         ld de,altVars
         ld bc,8 * 2
@@ -694,15 +694,15 @@ call_:
 
 dot_:       
         pop hl
-        call printdec
+        call prtdec
 dot2:
         ld a,' '           
-        call putChar
+        call putchar
         jp (iy)
 
 hdot_:                          ; print hexadecimal
         pop     hl
-        call printhex
+        call prthex
         jr   dot2
 
 drop_:                          ; Discard the top member of the stack
@@ -734,7 +734,8 @@ fetch1:
         push de              
         jp (iy)           
 
-hex_:   jp hex
+hexnum_:   
+        jp hexnum
 
 key_:
         call getchar
@@ -746,7 +747,7 @@ key_:
 mul_:   jp mul      
 
 nop_:       
-        jp NEXT             ; hardwire white space to always go to NEXT (important for arrays)
+        jp next             ; hardwire white space to always go to next (important for arrays)
 
 
 over_:  
@@ -1069,8 +1070,8 @@ outPort_:
         ld c,e
         jp (iy)        
 
-prnStr_:
-prnStr:
+prtstr_:
+prtstr:
         pop hl
         call putStr
         jp (iy)
@@ -1306,7 +1307,7 @@ mul2:
         inc de
         dec a
         jr nz,mul2
-		pop bc			    ; Restore the IP
+		pop bc			            ; Restore the IP
 		push hl                     ; Put the product on the stack - stack bug fixed 2/12/21
 		jp (iy)
 
@@ -1357,15 +1358,15 @@ num2:
         push hl                     ; Put the number on the stack
         jp (iy)                     ; and process the next character
 
-hex:                                ;=26
-	ld hl,0	    		    ; Clear hl to accept the number
-hex1:
+hexnum:                                ;
+	    ld hl,0	    		        ; Clear hl to accept the number
+hexnum1:
         inc bc
-        ld a,(bc)		    ; Get the character which is a numeral
+        ld a,(bc)		            ; Get the character which is a numeral
         bit 6,a                     ; is it uppercase alpha?
-        jr z, hex2                  ; no a decimal
+        jr z, hexnum2               ; no a decimal
         sub 7                       ; sub 7  to make $a - $F
-hex2:
+hexnum2:
         sub $30                     ; Form decimal digit
         jp c,num2
         cp $0F+1
@@ -1376,11 +1377,11 @@ hex2:
         add hl,hl                   ; 16X     
         add a,l                     ; add into bottom of hl
         ld  l,a                     ;   
-        jr  hex1
+        jr  hexnum1
 
-printdec:                           ;=34 ; removes leading zeros
+prtdec:                           ;=34 ; removes leading zeros
         bit 7,h
-        jr z,printdec0
+        jr z,prtdec0
         ld a,'-'
         call putchar
         xor a  
@@ -1389,59 +1390,59 @@ printdec:                           ;=34 ; removes leading zeros
         sbc a,a  
         sub h  
         ld h,a
-printdec0:                           ;=34 ; removes leading zeros
+prtdec0:                           ;=34 ; removes leading zeros
         push bc
         ld bc,0
         ld de,-10000
-        call printdec1
+        call prtdec1
         ld de,-1000
-        call printdec1
+        call prtdec1
         ld de,-100
-        call printdec1
+        call prtdec1
         ld e,-10
-        call printdec1
+        call prtdec1
         ld e,-1
-        call printdec1
+        call prtdec1
         pop bc
         ret
-printdec1:	                        ;=24 
+prtdec1:	                        ;=24 
         ld b,'0'-1
-printdec2:	    
+prtdec2:	    
         inc b
         add hl,de
-        jr c,printdec2
+        jr c,prtdec2
         sbc hl,de
         ld a,'0'
         cp b
-        jr nz,printdec3
+        jr nz,prtdec3
         xor a
         or c
         ret z
-        jr printdec4
-printdec3:	    
+        jr prtdec4
+prtdec3:	    
         inc c
-printdec4:	    
+prtdec4:	    
         ld a,b
         jp putchar
 
-printhex:                           ;=31  
+prthex:                           ;=31  
                                     ; Display hl as a 16-bit number in hex.
         push bc                     ; preserve the IP
         ld a,h
-        call printhex2
+        call prthex2
         ld a,l
-        call printhex2
+        call prthex2
         pop bc
         ret
-printhex2:		                    
+prthex2:		                    
         ld	c,a
 		rra 
 		rra 
 		rra 
 		rra 
-	    call printhex3
+	    call prthex3
 	    ld a,c
-printhex3:		
+prthex3:		
         and	0x0F
 		add	a,0x90
 		daa
