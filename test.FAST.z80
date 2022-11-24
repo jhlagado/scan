@@ -30,19 +30,16 @@ testsStart:
     test "3 3 <", 0
     test "3 3 >", 0
     test "4 3 >", 1
-    ; test "3 3 <=", 1
-
+    test "1 2 +", 3
+    test "123 456 +", 123+456
+    test "64 128 +", 64+128
+    test "5 3 -", 2
+    test "3 5 &", 1
+    test "3 5 |", 7
+    test "2 3 *", 6
+    test "1 2 3 + *", 5
     
-    ; test "1 2 +", 3
-    ; test "123 456 +", 123+456
-    ; test "64 128 +", 64+128
-    ; test "5 3 -", 2
-    ; test "3 5 &", 1
-    ; test "3 5 |", 7
     ; test "1 2 3 ' +", 3
-    ; test "2 3 *", 6
-    ; test "1 2 3 + *", 5
-    
     ; test "1_ 2 +",1
     ; test "1_ 1 +",0
     ; call enter
