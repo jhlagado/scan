@@ -912,7 +912,7 @@
 02D9   7E                     LD   A,(HL)   ; A = char in TIB
 02DA   23                     INC   HL   ; inc pointer into TIB
 02DB   0B                     DEC   BC   ; dec count of chars in TIB
-02DC   CD 15 04               CALL   nesting   ; update nesting value
+02DC   CD 1F 04               CALL   nesting   ; update nesting value
 02DF                INTERPRET4:      
 02DF   79                     LD   A,C   ; is count zero?
 02E0   B0                     OR   B   
@@ -931,7 +931,7 @@
 02ED   28 45                  JR   Z,waitchar4   
 02EF   FE 0D                  CP   "\r"   ; carriage return? ascii 13
 02F1   28 2B                  JR   Z,waitchar3   ; if anything else its macro/control
-02F3                             ; LD D,0
+02F3                             ; ld D,0
 02F3                MACRO:       ;=25
 02F3   ED 43 84 1C            LD   (vTIBPtr),BC   
 02F7   21 80 1B               LD   HL,ctrlCodes   
@@ -954,7 +954,7 @@
 0314   77                     LD   (HL),A   ; store the character in textbuf
 0315   03                     INC   BC   
 0316   CD 85 00               CALL   putchar   ; echo character to screen
-0319   CD 15 04               CALL   nesting   
+0319   CD 1F 04               CALL   nesting   
 031C   18 C6                  JR   waitchar   ; wait for next character
 031E                WAITCHAR3:      
 031E   21 00 18               LD   HL,TIB   
@@ -981,7 +981,7 @@
 033C                             ; 
 033C                             ; Get the next character and form a 1 byte jump address
 033C                             ; 
-033C                             ; This target jump address is loaded into HL, and using JP (HL) to quickly
+033C                             ; This target jump address is loaded into HL, and using jp (HL) to quickly
 033C                             ; jump to the selected function.
 033C                             ; 
 033C                             ; Individual handler routines will deal with each category:
@@ -1013,7 +1013,7 @@
 0356   11 80 1C               LD   DE,altVars   
 0359   01 10 00               LD   BC,8 * 2   
 035C   ED B0                  LDIR      
-035E   21 C0 1C               LD   HL,mintData   ; init namespaces to 0 using LDIR
+035E   21 C0 1C               LD   HL,mintData   ; init namespaces to 0 using ldir
 0361   54 5D                  LD   DE,HL   
 0363   13                     INC   DE   
 0364   36 00                  LD   (HL),0   
@@ -1080,130 +1080,122 @@
 03BA   AF                     XOR   A   
 03BB   B3                     OR   E   ; sets Z flag if A-Z
 03BC   C9                     RET      
-03BD                             ; printdec:                           ;=36
-03BD                             ;         LD DE,-10000			; Siena ., 5th location of a dev number
-03BD                             ;         CALL printdec1			; text book method look it up
-03BD                             ;         LD DE,-1000
-03BD                             ;         CALL printdec1
-03BD                             ;         LD DE,-100
-03BD                             ;         CALL printdec1
-03BD                             ;         LD E,-10
-03BD                             ;         CALL printdec1
-03BD                             ;         LD E,-1
-03BD                             ; printdec1:	
-03BD                             ;         LD A,"0"-1
-03BD                             ; printdec2:	
-03BD                             ;         INC A
-03BD                             ;         ADD HL,DE
-03BD                             ;         JR C,printdec2
-03BD                             ;         SBC HL,DE
-03BD                             ;         JP putchar
-03BD                PRINTDEC:      ;=34 ; removes leading zeros
-03BD   C5                     PUSH   BC   
-03BE   01 00 00               LD   BC,0   
-03C1   11 F0 D8               LD   DE,-10000   
-03C4   CD DF 03               CALL   printdec1   
-03C7   11 18 FC               LD   DE,-1000   
-03CA   CD DF 03               CALL   printdec1   
-03CD   11 9C FF               LD   DE,-100   
-03D0   CD DF 03               CALL   printdec1   
-03D3   1E F6                  LD   E,-10   
-03D5   CD DF 03               CALL   printdec1   
-03D8   1E FF                  LD   E,-1   
-03DA   CD DF 03               CALL   printdec1   
-03DD   C1                     POP   BC   
-03DE   C9                     RET      
-03DF                PRINTDEC1:      ;=24
-03DF   06 2F                  LD   B,"0"-1   
-03E1                PRINTDEC2:      
-03E1   04                     INC   B   
-03E2   19                     ADD   HL,DE   
-03E3   38 FC                  JR   C,printdec2   
-03E5   ED 52                  SBC   HL,DE   
-03E7   3E 30                  LD   A,"0"   
-03E9   B8                     CP   B   
-03EA   20 05                  JR   NZ,printdec3   
-03EC   AF                     XOR   A   
-03ED   B1                     OR   C   
-03EE   C8                     RET   Z   
-03EF   18 01                  JR   printdec4   
-03F1                PRINTDEC3:      
-03F1   0C                     INC   C   
-03F2                PRINTDEC4:      
-03F2   78                     LD   A,B   
-03F3   C3 85 00               JP   putchar   
-03F6                PRINTHEX:      ;=31
-03F6                             ; Display HL as a 16-bit number in hex.
-03F6   C5                     PUSH   BC   ; preserve the IP
-03F7   7C                     LD   A,H   
-03F8   CD 01 04               CALL   printhex2   
-03FB   7D                     LD   A,L   
-03FC   CD 01 04               CALL   printhex2   
-03FF   C1                     POP   BC   
-0400   C9                     RET      
-0401                PRINTHEX2:      
-0401   4F                     LD   C,A   
-0402   1F                     RRA      
-0403   1F                     RRA      
-0404   1F                     RRA      
-0405   1F                     RRA      
-0406   CD 0A 04               CALL   printhex3   
-0409   79                     LD   A,C   
-040A                PRINTHEX3:      
-040A   E6 0F                  AND   0x0F   
-040C   C6 90                  ADD   A,0x90   
-040E   27                     DAA      
-040F   CE 40                  ADC   A,0x40   
-0411   27                     DAA      
-0412   C3 85 00               JP   putchar   
-0415                             ; **************************************************************************
-0415                             ; calculate nesting value
-0415                             ; A is char to be tested,
-0415                             ; E is the nesting value (initially 0)
-0415                             ; E is increased by ( and [
-0415                             ; E is decreased by ) and ]
-0415                             ; E has its bit 7 toggled by `
-0415                             ; limited to 127 levels
-0415                             ; **************************************************************************
-0415                NESTING:      ;=44
-0415   FE 60                  CP   "`"   
-0417   20 0A                  JR   NZ,nesting1   
-0419   CB 7B                  BIT   7,E   
-041B   28 03                  JR   Z,nesting1a   
-041D   CB BB                  RES   7,E   
-041F   C9                     RET      
-0420                NESTING1A:      
-0420   CB FB                  SET   7,E   
-0422   C9                     RET      
-0423                NESTING1:      
+03BD                ABSHL:       
+03BD   CB 7C                  BIT   7,h   
+03BF   C8                     RET   z   
+03C0   AF                     XOR   a   
+03C1   95                     SUB   l   
+03C2   6F                     LD   l,a   
+03C3   9F                     SBC   a,a   
+03C4   94                     SUB   h   
+03C5   67                     LD   h,a   
+03C6   C9                     RET      
+03C7                PRINTDEC:      ;=34 ; removes leading zeros
+03C7   C5                     PUSH   BC   
+03C8   01 00 00               LD   BC,0   
+03CB   11 F0 D8               LD   DE,-10000   
+03CE   CD E9 03               CALL   printdec1   
+03D1   11 18 FC               LD   DE,-1000   
+03D4   CD E9 03               CALL   printdec1   
+03D7   11 9C FF               LD   DE,-100   
+03DA   CD E9 03               CALL   printdec1   
+03DD   1E F6                  LD   E,-10   
+03DF   CD E9 03               CALL   printdec1   
+03E2   1E FF                  LD   E,-1   
+03E4   CD E9 03               CALL   printdec1   
+03E7   C1                     POP   BC   
+03E8   C9                     RET      
+03E9                PRINTDEC1:      ;=24
+03E9   06 2F                  LD   B,"0"-1   
+03EB                PRINTDEC2:      
+03EB   04                     INC   B   
+03EC   19                     ADD   HL,DE   
+03ED   38 FC                  JR   C,printdec2   
+03EF   ED 52                  SBC   HL,DE   
+03F1   3E 30                  LD   A,"0"   
+03F3   B8                     CP   B   
+03F4   20 05                  JR   NZ,printdec3   
+03F6   AF                     XOR   A   
+03F7   B1                     OR   C   
+03F8   C8                     RET   Z   
+03F9   18 01                  JR   printdec4   
+03FB                PRINTDEC3:      
+03FB   0C                     INC   C   
+03FC                PRINTDEC4:      
+03FC   78                     LD   A,B   
+03FD   C3 85 00               JP   putchar   
+0400                PRINTHEX:      ;=31
+0400                             ; Display HL as a 16-bit number in hex.
+0400   C5                     PUSH   BC   ; preserve the IP
+0401   7C                     LD   A,H   
+0402   CD 0B 04               CALL   printhex2   
+0405   7D                     LD   A,L   
+0406   CD 0B 04               CALL   printhex2   
+0409   C1                     POP   BC   
+040A   C9                     RET      
+040B                PRINTHEX2:      
+040B   4F                     LD   C,A   
+040C   1F                     RRA      
+040D   1F                     RRA      
+040E   1F                     RRA      
+040F   1F                     RRA      
+0410   CD 14 04               CALL   printhex3   
+0413   79                     LD   A,C   
+0414                PRINTHEX3:      
+0414   E6 0F                  AND   0x0F   
+0416   C6 90                  ADD   A,0x90   
+0418   27                     DAA      
+0419   CE 40                  ADC   A,0x40   
+041B   27                     DAA      
+041C   C3 85 00               JP   putchar   
+041F                             ; **************************************************************************
+041F                             ; calculate nesting value
+041F                             ; A is char to be tested,
+041F                             ; E is the nesting value (initially 0)
+041F                             ; E is increased by ( and [
+041F                             ; E is decreased by ) and ]
+041F                             ; E has its bit 7 toggled by `
+041F                             ; limited to 127 levels
+041F                             ; **************************************************************************
+041F                NESTING:      ;=44
+041F   FE 60                  CP   "`"   
+0421   20 0A                  JR   NZ,nesting1   
 0423   CB 7B                  BIT   7,E   
-0425   C0                     RET   NZ   
-0426   FE 3A                  CP   ":"   
-0428   28 08                  JR   Z,nesting2   
-042A   FE 5B                  CP   "["   
-042C   28 04                  JR   Z,nesting2   
-042E   FE 28                  CP   "("   
-0430   20 02                  JR   NZ,nesting3   
-0432                NESTING2:      
-0432   1C                     INC   E   
-0433   C9                     RET      
-0434                NESTING3:      
-0434   FE 3B                  CP   ";"   
-0436   28 07                  JR   Z,nesting4   
-0438   FE 5D                  CP   "]"   
-043A   28 03                  JR   Z,nesting4   
-043C   FE 29                  CP   ")"   
-043E   C0                     RET   NZ   
-043F                NESTING4:      
-043F   1D                     DEC   E   
-0440   C9                     RET      
-0441                             ; **********************************************************************			
-0441                             ; Page 4 primitive routines
-0441                             ; **********************************************************************
-0441                          ALIGN   $100   
+0425   28 03                  JR   Z,nesting1a   
+0427   CB BB                  RES   7,E   
+0429   C9                     RET      
+042A                NESTING1A:      
+042A   CB FB                  SET   7,E   
+042C   C9                     RET      
+042D                NESTING1:      
+042D   CB 7B                  BIT   7,E   
+042F   C0                     RET   NZ   
+0430   FE 3A                  CP   ":"   
+0432   28 08                  JR   Z,nesting2   
+0434   FE 5B                  CP   "["   
+0436   28 04                  JR   Z,nesting2   
+0438   FE 28                  CP   "("   
+043A   20 02                  JR   NZ,nesting3   
+043C                NESTING2:      
+043C   1C                     INC   E   
+043D   C9                     RET      
+043E                NESTING3:      
+043E   FE 3B                  CP   ";"   
+0440   28 07                  JR   Z,nesting4   
+0442   FE 5D                  CP   "]"   
+0444   28 03                  JR   Z,nesting4   
+0446   FE 29                  CP   ")"   
+0448   C0                     RET   NZ   
+0449                NESTING4:      
+0449   1D                     DEC   E   
+044A   C9                     RET      
+044B                             ; **********************************************************************			
+044B                             ; Page 4 primitive routines
+044B                             ; **********************************************************************
+044B                          ALIGN   $100   
 0500                PAGE4:       
 0500                AND_:        
-0500   D1                     POP   DE   ;     Bitwise AND the top 2 elements of the stack
+0500   D1                     POP   DE   ;     Bitwise and the top 2 elements of the stack
 0501   E1                     POP   HL   ; 
 0502   7B                     LD   A,E   ; 
 0503   A5                     AND   L   ; 
@@ -1216,7 +1208,7 @@
 0509   FD E9                  JP   (IY)   ; 
 050B                             ; 
 050B                OR_:         
-050B   D1                     POP   DE   ; Bitwise OR the top 2 elements of the stack
+050B   D1                     POP   DE   ; Bitwise or the top 2 elements of the stack
 050C   E1                     POP   HL   
 050D   7B                     LD   A,E   
 050E   B5                     OR   L   
@@ -1225,7 +1217,7 @@
 0511   B4                     OR   H   
 0512   18 F3                  JR   and1   
 0514                XOR_:        
-0514   D1                     POP   DE   ; Bitwise XOR the top 2 elements of the stack
+0514   D1                     POP   DE   ; Bitwise xor the top 2 elements of the stack
 0515                XOR1:        
 0515   E1                     POP   HL   
 0516   7B                     LD   A,E   
@@ -1237,7 +1229,7 @@
 051D                INV_:        ; Bitwise INVert the top member of the stack
 051D   11 FF FF               LD   DE,$FFFF   ; by xoring with $FFFF
 0520   18 F3                  JR   xor1   
-0522                ADD_:        ; Add the top 2 members of the stack
+0522                ADD_:        ; add the top 2 members of the stack
 0522   D1                     POP   DE   
 0523   E1                     POP   HL   
 0524   19                     ADD   HL,DE   
@@ -1252,14 +1244,14 @@
 052F   C3 2C 07               JP   go1   
 0532                DOT_:        
 0532   E1                     POP   HL   
-0533   CD BD 03               CALL   printdec   
+0533   CD C7 03               CALL   printdec   
 0536                DOT2:        
 0536   3E 20                  LD   A," "   
 0538   CD 85 00               CALL   putChar   
 053B   FD E9                  JP   (IY)   
 053D                HDOT_:       ; print hexadecimal
 053D   E1                     POP   HL   
-053E   CD F6 03               CALL   printhex   
+053E   CD 00 04               CALL   printhex   
 0541   18 F3                  JR   dot2   
 0543                DROP_:       ; Discard the top member of the stack
 0543   E1                     POP   HL   
@@ -1301,7 +1293,7 @@
 0572   D1                     POP   DE   
 0573   D5                     PUSH   DE   
 0574   E5                     PUSH   HL   
-0575   D5                     PUSH   DE   ; And push it to top of stack
+0575   D5                     PUSH   DE   ; and push it to top of stack
 0576   FD E9                  JP   (IY)   
 0578                RET_:        
 0578   CD F9 08               CALL   rpop   ; Restore Instruction pointer
@@ -1493,8 +1485,8 @@
 0655   59                     LD   E,C   
 0656                DIV4:        
 0656   C1                     POP   BC   ; Restore the IP
-0657   D5                     PUSH   DE   ; Push Result
-0658   E5                     PUSH   HL   ; Push remainder
+0657   D5                     PUSH   DE   ; push Result
+0658   E5                     PUSH   HL   ; push remainder
 0659   FD E9                  JP   (IY)   
 065B                             ;=57
 065B                             ; **************************************************************************
@@ -1797,18 +1789,18 @@
 089D                             ; and then added into the L register. (HL forms a 16-bit accumulator)
 089D                             ; Fetch the next character, if it is a number, multiply contents of HL by 10
 089D                             ; and then add in the next digit. Repeat this until a non-number character is
-089D                             ; detected. Add in the final digit so that HL contains the converted number.
-089D                             ; Push HL onto the stack and proceed to the dispatch routine.
+089D                             ; detected. add in the final digit so that HL contains the converted number.
+089D                             ; push HL onto the stack and proceed to the dispatch routine.
 089D                             ; ********************************************************************************
 089D                NUM:         ;=23
 089D   21 00 00               LD   HL,$0000   ;     Clear HL to accept the number
 08A0   0A                     LD   A,(BC)   ;     Get the character which is a numeral
 08A1                NUM1:        ; corrected KB 24/11/21
 08A1   D6 30                  SUB   $30   ;       Form decimal digit
-08A3   85                     ADD   A,L   ;       Add into bottom of HL
+08A3   85                     ADD   A,L   ;       add into bottom of HL
 08A4   6F                     LD   L,A   ; 
 08A5   3E 00                  LD   A,00   ;       Clear A
-08A7   8C                     ADC   A,H   ; Add with carry H-reg
+08A7   8C                     ADC   A,H   ; add with carry H-reg
 08A8   67                     LD   H,A   ; Put result in H-reg
 08A9   03                     INC   BC   ;       Increment IP
 08AA   0A                     LD   A,(BC)   ;       and get the next character
@@ -1818,7 +1810,7 @@
 08B1   30 08                  JR   NC,num2   ;       Not a number / end of number
 08B3                             ; Multiply digit(s) in HL by 10
 08B3   29                     ADD   HL,HL   ;        2X
-08B4   5D                     LD   E,L   ;        LD DE,HL
+08B4   5D                     LD   E,L   ;        ld DE,HL
 08B5   54                     LD   D,H   ; 
 08B6   29                     ADD   HL,HL   ;        4X
 08B7   29                     ADD   HL,HL   ;        8X
@@ -1846,7 +1838,7 @@
 08D5   29                     ADD   HL,HL   ; 4X
 08D6   29                     ADD   HL,HL   ; 8X
 08D7   29                     ADD   HL,HL   ; 16X
-08D8   85                     ADD   A,L   ; Add into bottom of HL
+08D8   85                     ADD   A,L   ; add into bottom of HL
 08D9   6F                     LD   L,A   ; 
 08DA   18 E6                  JR   hex1   
 08DC                             ;*******************************************************************
@@ -2038,14 +2030,14 @@ RXCHAR:             0078 DEFINED AT LINE 310 IN IOSerial.asm
                     > USED AT LINE 314 IN IOSerial.asm
 GETCHAR:            0081 DEFINED AT LINE 434 IN IOSerial.asm
                     > USED AT LINE 421 IN SCAN.asm
-                    > USED AT LINE 819 IN SCAN.asm
+                    > USED AT LINE 811 IN SCAN.asm
 PUTCHAR:            0085 DEFINED AT LINE 438 IN IOSerial.asm
                     > USED AT LINE 451 IN SCAN.asm
-                    > USED AT LINE 643 IN SCAN.asm
-                    > USED AT LINE 668 IN SCAN.asm
-                    > USED AT LINE 779 IN SCAN.asm
-                    > USED AT LINE 1094 IN SCAN.asm
-                    > USED AT LINE 1470 IN SCAN.asm
+                    > USED AT LINE 635 IN SCAN.asm
+                    > USED AT LINE 660 IN SCAN.asm
+                    > USED AT LINE 771 IN SCAN.asm
+                    > USED AT LINE 1086 IN SCAN.asm
+                    > USED AT LINE 1462 IN SCAN.asm
 RESET:              008B DEFINED AT LINE 444 IN IOSerial.asm
                     > USED AT LINE 103 IN IOSerial.asm
 DSIZE:              0080 DEFINED AT LINE 15 IN SCAN.asm
@@ -2057,7 +2049,7 @@ LSIZE:              0080 DEFINED AT LINE 17 IN SCAN.asm
 TIBSIZE:            0100 DEFINED AT LINE 18 IN SCAN.asm
                     > USED AT LINE 3 IN ram.asm
 TRUE:               0001 DEFINED AT LINE 19 IN SCAN.asm
-                    > USED AT LINE 936 IN SCAN.asm
+                    > USED AT LINE 928 IN SCAN.asm
 FALSE:              0000 DEFINED AT LINE 20 IN SCAN.asm
                     > USED AT LINE 55 IN SCAN.asm
 EMPTY:              0000 DEFINED AT LINE 21 IN SCAN.asm
@@ -2070,7 +2062,7 @@ IALTVARS:           0180 DEFINED AT LINE 53 IN SCAN.asm
 IOPCODES:           0190 DEFINED AT LINE 65 IN SCAN.asm
                     > USED AT LINE 525 IN SCAN.asm
 ETX:                02A6 DEFINED AT LINE 376 IN SCAN.asm
-                    > USED AT LINE 797 IN SCAN.asm
+                    > USED AT LINE 789 IN SCAN.asm
 ETX1:               02AF DEFINED AT LINE 381 IN SCAN.asm
                     > USED AT LINE 379 IN SCAN.asm
 START:              02B1 DEFINED AT LINE 384 IN SCAN.asm
@@ -2097,7 +2089,7 @@ WAITCHAR4:          0334 DEFINED AT LINE 471 IN SCAN.asm
                     > USED AT LINE 425 IN SCAN.asm
 NEXT:               033C DEFINED AT LINE 498 IN SCAN.asm
                     > USED AT LINE 511 IN SCAN.asm
-                    > USED AT LINE 828 IN SCAN.asm
+                    > USED AT LINE 820 IN SCAN.asm
 INIT:               0345 DEFINED AT LINE 507 IN SCAN.asm
                     > USED AT LINE 386 IN SCAN.asm
 INITOPS:            036B DEFINED AT LINE 524 IN SCAN.asm
@@ -2112,206 +2104,207 @@ ENTER:              038F DEFINED AT LINE 552 IN SCAN.asm
                     > USED AT LINE 440 IN SCAN.asm
 PRINTSTR:           0398 DEFINED AT LINE 559 IN SCAN.asm
                     > USED AT LINE 387 IN SCAN.asm
-                    > USED AT LINE 1465 IN SCAN.asm
-                    > USED AT LINE 1494 IN SCAN.asm
+                    > USED AT LINE 1457 IN SCAN.asm
+                    > USED AT LINE 1486 IN SCAN.asm
 LOOKUPREF:          039F DEFINED AT LINE 566 IN SCAN.asm
 LOOKUPREF0:         03A1 DEFINED AT LINE 568 IN SCAN.asm
 LOOKUPREF1:         03A5 DEFINED AT LINE 571 IN SCAN.asm
-                    > USED AT LINE 767 IN SCAN.asm
+                    > USED AT LINE 759 IN SCAN.asm
 LOOKUPREF2:         03AB DEFINED AT LINE 575 IN SCAN.asm
                     > USED AT LINE 570 IN SCAN.asm
-                    > USED AT LINE 941 IN SCAN.asm
+                    > USED AT LINE 933 IN SCAN.asm
 LOOKUPREF3:         03AF DEFINED AT LINE 578 IN SCAN.asm
                     > USED AT LINE 574 IN SCAN.asm
-PRINTDEC:           03BD DEFINED AT LINE 610 IN SCAN.asm
-                    > USED AT LINE 776 IN SCAN.asm
-PRINTDEC1:          03DF DEFINED AT LINE 625 IN SCAN.asm
+ABSHL:              03BD DEFINED AT LINE 591 IN SCAN.asm
+PRINTDEC:           03C7 DEFINED AT LINE 602 IN SCAN.asm
+                    > USED AT LINE 768 IN SCAN.asm
+PRINTDEC1:          03E9 DEFINED AT LINE 617 IN SCAN.asm
+                    > USED AT LINE 606 IN SCAN.asm
+                    > USED AT LINE 608 IN SCAN.asm
+                    > USED AT LINE 610 IN SCAN.asm
+                    > USED AT LINE 612 IN SCAN.asm
                     > USED AT LINE 614 IN SCAN.asm
-                    > USED AT LINE 616 IN SCAN.asm
-                    > USED AT LINE 618 IN SCAN.asm
-                    > USED AT LINE 620 IN SCAN.asm
+PRINTDEC2:          03EB DEFINED AT LINE 619 IN SCAN.asm
                     > USED AT LINE 622 IN SCAN.asm
-PRINTDEC2:          03E1 DEFINED AT LINE 627 IN SCAN.asm
+PRINTDEC3:          03FB DEFINED AT LINE 631 IN SCAN.asm
+                    > USED AT LINE 626 IN SCAN.asm
+PRINTDEC4:          03FC DEFINED AT LINE 633 IN SCAN.asm
                     > USED AT LINE 630 IN SCAN.asm
-PRINTDEC3:          03F1 DEFINED AT LINE 639 IN SCAN.asm
-                    > USED AT LINE 634 IN SCAN.asm
-PRINTDEC4:          03F2 DEFINED AT LINE 641 IN SCAN.asm
-                    > USED AT LINE 638 IN SCAN.asm
-PRINTHEX:           03F6 DEFINED AT LINE 645 IN SCAN.asm
-                    > USED AT LINE 784 IN SCAN.asm
-PRINTHEX2:          0401 DEFINED AT LINE 654 IN SCAN.asm
-                    > USED AT LINE 649 IN SCAN.asm
-                    > USED AT LINE 651 IN SCAN.asm
-PRINTHEX3:          040A DEFINED AT LINE 662 IN SCAN.asm
-                    > USED AT LINE 660 IN SCAN.asm
-NESTING:            0415 DEFINED AT LINE 680 IN SCAN.asm
+PRINTHEX:           0400 DEFINED AT LINE 637 IN SCAN.asm
+                    > USED AT LINE 776 IN SCAN.asm
+PRINTHEX2:          040B DEFINED AT LINE 646 IN SCAN.asm
+                    > USED AT LINE 641 IN SCAN.asm
+                    > USED AT LINE 643 IN SCAN.asm
+PRINTHEX3:          0414 DEFINED AT LINE 654 IN SCAN.asm
+                    > USED AT LINE 652 IN SCAN.asm
+NESTING:            041F DEFINED AT LINE 672 IN SCAN.asm
                     > USED AT LINE 407 IN SCAN.asm
                     > USED AT LINE 452 IN SCAN.asm
-NESTING1A:          0420 DEFINED AT LINE 687 IN SCAN.asm
-                    > USED AT LINE 684 IN SCAN.asm
-NESTING1:           0423 DEFINED AT LINE 690 IN SCAN.asm
-                    > USED AT LINE 682 IN SCAN.asm
-NESTING2:           0432 DEFINED AT LINE 699 IN SCAN.asm
-                    > USED AT LINE 694 IN SCAN.asm
+NESTING1A:          042A DEFINED AT LINE 679 IN SCAN.asm
+                    > USED AT LINE 676 IN SCAN.asm
+NESTING1:           042D DEFINED AT LINE 682 IN SCAN.asm
+                    > USED AT LINE 674 IN SCAN.asm
+NESTING2:           043C DEFINED AT LINE 691 IN SCAN.asm
+                    > USED AT LINE 686 IN SCAN.asm
+                    > USED AT LINE 688 IN SCAN.asm
+NESTING3:           043E DEFINED AT LINE 694 IN SCAN.asm
+                    > USED AT LINE 690 IN SCAN.asm
+NESTING4:           0449 DEFINED AT LINE 701 IN SCAN.asm
                     > USED AT LINE 696 IN SCAN.asm
-NESTING3:           0434 DEFINED AT LINE 702 IN SCAN.asm
                     > USED AT LINE 698 IN SCAN.asm
-NESTING4:           043F DEFINED AT LINE 709 IN SCAN.asm
-                    > USED AT LINE 704 IN SCAN.asm
-                    > USED AT LINE 706 IN SCAN.asm
-PAGE4:              0500 DEFINED AT LINE 717 IN SCAN.asm
-AND_:               0500 DEFINED AT LINE 719 IN SCAN.asm
-                    > USED AT LINE 1178 IN SCAN.asm
-AND1:               0507 DEFINED AT LINE 727 IN SCAN.asm
-                    > USED AT LINE 741 IN SCAN.asm
-                    > USED AT LINE 752 IN SCAN.asm
-OR_:                050B DEFINED AT LINE 733 IN SCAN.asm
-                    > USED AT LINE 1287 IN SCAN.asm
-XOR_:               0514 DEFINED AT LINE 743 IN SCAN.asm
-                    > USED AT LINE 1342 IN SCAN.asm
-XOR1:               0515 DEFINED AT LINE 745 IN SCAN.asm
-                    > USED AT LINE 756 IN SCAN.asm
-INV_:               051D DEFINED AT LINE 754 IN SCAN.asm
-                    > USED AT LINE 1240 IN SCAN.asm
-ADD_:               0522 DEFINED AT LINE 758 IN SCAN.asm
-                    > USED AT LINE 1176 IN SCAN.asm
-CALL_:              0528 DEFINED AT LINE 765 IN SCAN.asm
-DOT_:               0532 DEFINED AT LINE 774 IN SCAN.asm
-DOT2:               0536 DEFINED AT LINE 777 IN SCAN.asm
-                    > USED AT LINE 785 IN SCAN.asm
-HDOT_:              053D DEFINED AT LINE 782 IN SCAN.asm
-DROP_:              0543 DEFINED AT LINE 787 IN SCAN.asm
-                    > USED AT LINE 1200 IN SCAN.asm
-DUP_:               0546 DEFINED AT LINE 791 IN SCAN.asm
-                    > USED AT LINE 1202 IN SCAN.asm
-ETX_:               054B DEFINED AT LINE 796 IN SCAN.asm
-EXIT_:              054E DEFINED AT LINE 799 IN SCAN.asm
-FETCH_:             0558 DEFINED AT LINE 807 IN SCAN.asm
-FETCH1:             0559 DEFINED AT LINE 809 IN SCAN.asm
-HEX_:               055F DEFINED AT LINE 816 IN SCAN.asm
-KEY_:               0562 DEFINED AT LINE 818 IN SCAN.asm
-                    > USED AT LINE 1249 IN SCAN.asm
-MUL_:               056B DEFINED AT LINE 825 IN SCAN.asm
-                    > USED AT LINE 1269 IN SCAN.asm
-NOP_:               056E DEFINED AT LINE 827 IN SCAN.asm
-OVER_:              0571 DEFINED AT LINE 831 IN SCAN.asm
-                    > USED AT LINE 1285 IN SCAN.asm
-RET_:               0578 DEFINED AT LINE 839 IN SCAN.asm
-ROT_:               057F DEFINED AT LINE 844 IN SCAN.asm
-                    > USED AT LINE 1302 IN SCAN.asm
-SHL_:               0586 DEFINED AT LINE 853 IN SCAN.asm
-SHR_:               058B DEFINED AT LINE 860 IN SCAN.asm
-SHR1:               058C DEFINED AT LINE 862 IN SCAN.asm
-STORE_:             0593 DEFINED AT LINE 868 IN SCAN.asm
-SWAP_:              059A DEFINED AT LINE 876 IN SCAN.asm
-                    > USED AT LINE 1318 IN SCAN.asm
-NEG_:               059F DEFINED AT LINE 882 IN SCAN.asm
+PAGE4:              0500 DEFINED AT LINE 709 IN SCAN.asm
+AND_:               0500 DEFINED AT LINE 711 IN SCAN.asm
+                    > USED AT LINE 1170 IN SCAN.asm
+AND1:               0507 DEFINED AT LINE 719 IN SCAN.asm
+                    > USED AT LINE 733 IN SCAN.asm
+                    > USED AT LINE 744 IN SCAN.asm
+OR_:                050B DEFINED AT LINE 725 IN SCAN.asm
+                    > USED AT LINE 1279 IN SCAN.asm
+XOR_:               0514 DEFINED AT LINE 735 IN SCAN.asm
+                    > USED AT LINE 1334 IN SCAN.asm
+XOR1:               0515 DEFINED AT LINE 737 IN SCAN.asm
+                    > USED AT LINE 748 IN SCAN.asm
+INV_:               051D DEFINED AT LINE 746 IN SCAN.asm
+                    > USED AT LINE 1232 IN SCAN.asm
+ADD_:               0522 DEFINED AT LINE 750 IN SCAN.asm
+                    > USED AT LINE 1168 IN SCAN.asm
+CALL_:              0528 DEFINED AT LINE 757 IN SCAN.asm
+DOT_:               0532 DEFINED AT LINE 766 IN SCAN.asm
+DOT2:               0536 DEFINED AT LINE 769 IN SCAN.asm
+                    > USED AT LINE 777 IN SCAN.asm
+HDOT_:              053D DEFINED AT LINE 774 IN SCAN.asm
+DROP_:              0543 DEFINED AT LINE 779 IN SCAN.asm
+                    > USED AT LINE 1192 IN SCAN.asm
+DUP_:               0546 DEFINED AT LINE 783 IN SCAN.asm
+                    > USED AT LINE 1194 IN SCAN.asm
+ETX_:               054B DEFINED AT LINE 788 IN SCAN.asm
+EXIT_:              054E DEFINED AT LINE 791 IN SCAN.asm
+FETCH_:             0558 DEFINED AT LINE 799 IN SCAN.asm
+FETCH1:             0559 DEFINED AT LINE 801 IN SCAN.asm
+HEX_:               055F DEFINED AT LINE 808 IN SCAN.asm
+KEY_:               0562 DEFINED AT LINE 810 IN SCAN.asm
+                    > USED AT LINE 1241 IN SCAN.asm
+MUL_:               056B DEFINED AT LINE 817 IN SCAN.asm
+                    > USED AT LINE 1261 IN SCAN.asm
+NOP_:               056E DEFINED AT LINE 819 IN SCAN.asm
+OVER_:              0571 DEFINED AT LINE 823 IN SCAN.asm
                     > USED AT LINE 1277 IN SCAN.asm
-SUB_:               05A5 DEFINED AT LINE 887 IN SCAN.asm
-                    > USED AT LINE 1316 IN SCAN.asm
-SUB2:               05A7 DEFINED AT LINE 890 IN SCAN.asm
-                    > USED AT LINE 885 IN SCAN.asm
-EQ_:                05AD DEFINED AT LINE 896 IN SCAN.asm
-                    > USED AT LINE 1210 IN SCAN.asm
-FALSE_:             05B4 DEFINED AT LINE 902 IN SCAN.asm
-                    > USED AT LINE 918 IN SCAN.asm
-                    > USED AT LINE 919 IN SCAN.asm
-                    > USED AT LINE 935 IN SCAN.asm
-GT_:                05BA DEFINED AT LINE 907 IN SCAN.asm
-                    > USED AT LINE 1230 IN SCAN.asm
-LT_:                05BE DEFINED AT LINE 912 IN SCAN.asm
-                    > USED AT LINE 1259 IN SCAN.asm
-LT1:                05C0 DEFINED AT LINE 915 IN SCAN.asm
+RET_:               0578 DEFINED AT LINE 831 IN SCAN.asm
+ROT_:               057F DEFINED AT LINE 836 IN SCAN.asm
+                    > USED AT LINE 1294 IN SCAN.asm
+SHL_:               0586 DEFINED AT LINE 845 IN SCAN.asm
+SHR_:               058B DEFINED AT LINE 852 IN SCAN.asm
+SHR1:               058C DEFINED AT LINE 854 IN SCAN.asm
+STORE_:             0593 DEFINED AT LINE 860 IN SCAN.asm
+SWAP_:              059A DEFINED AT LINE 868 IN SCAN.asm
+                    > USED AT LINE 1310 IN SCAN.asm
+NEG_:               059F DEFINED AT LINE 874 IN SCAN.asm
+                    > USED AT LINE 1269 IN SCAN.asm
+SUB_:               05A5 DEFINED AT LINE 879 IN SCAN.asm
+                    > USED AT LINE 1308 IN SCAN.asm
+SUB2:               05A7 DEFINED AT LINE 882 IN SCAN.asm
+                    > USED AT LINE 877 IN SCAN.asm
+EQ_:                05AD DEFINED AT LINE 888 IN SCAN.asm
+                    > USED AT LINE 1202 IN SCAN.asm
+FALSE_:             05B4 DEFINED AT LINE 894 IN SCAN.asm
                     > USED AT LINE 910 IN SCAN.asm
-TRUE_:              05C8 DEFINED AT LINE 920 IN SCAN.asm
-                    > USED AT LINE 901 IN SCAN.asm
-GTE_:               05CE DEFINED AT LINE 925 IN SCAN.asm
-LTE_:               05D2 DEFINED AT LINE 929 IN SCAN.asm
-LTE1:               05D4 DEFINED AT LINE 932 IN SCAN.asm
-                    > USED AT LINE 928 IN SCAN.asm
-VAR_:               05DD DEFINED AT LINE 939 IN SCAN.asm
-                    > USED AT LINE 1180 IN SCAN.asm
-                    > USED AT LINE 1190 IN SCAN.asm
+                    > USED AT LINE 911 IN SCAN.asm
+                    > USED AT LINE 927 IN SCAN.asm
+GT_:                05BA DEFINED AT LINE 899 IN SCAN.asm
+                    > USED AT LINE 1222 IN SCAN.asm
+LT_:                05BE DEFINED AT LINE 904 IN SCAN.asm
+                    > USED AT LINE 1251 IN SCAN.asm
+LT1:                05C0 DEFINED AT LINE 907 IN SCAN.asm
+                    > USED AT LINE 902 IN SCAN.asm
+TRUE_:              05C8 DEFINED AT LINE 912 IN SCAN.asm
+                    > USED AT LINE 893 IN SCAN.asm
+GTE_:               05CE DEFINED AT LINE 917 IN SCAN.asm
+LTE_:               05D2 DEFINED AT LINE 921 IN SCAN.asm
+LTE1:               05D4 DEFINED AT LINE 924 IN SCAN.asm
+                    > USED AT LINE 920 IN SCAN.asm
+VAR_:               05DD DEFINED AT LINE 931 IN SCAN.asm
+                    > USED AT LINE 1172 IN SCAN.asm
+                    > USED AT LINE 1182 IN SCAN.asm
+                    > USED AT LINE 1196 IN SCAN.asm
                     > USED AT LINE 1204 IN SCAN.asm
                     > USED AT LINE 1212 IN SCAN.asm
-                    > USED AT LINE 1220 IN SCAN.asm
-                    > USED AT LINE 1232 IN SCAN.asm
-                    > USED AT LINE 1242 IN SCAN.asm
-                    > USED AT LINE 1251 IN SCAN.asm
-                    > USED AT LINE 1261 IN SCAN.asm
+                    > USED AT LINE 1224 IN SCAN.asm
+                    > USED AT LINE 1234 IN SCAN.asm
+                    > USED AT LINE 1243 IN SCAN.asm
+                    > USED AT LINE 1253 IN SCAN.asm
+                    > USED AT LINE 1263 IN SCAN.asm
                     > USED AT LINE 1271 IN SCAN.asm
-                    > USED AT LINE 1279 IN SCAN.asm
+                    > USED AT LINE 1281 IN SCAN.asm
                     > USED AT LINE 1289 IN SCAN.asm
-                    > USED AT LINE 1297 IN SCAN.asm
-                    > USED AT LINE 1304 IN SCAN.asm
+                    > USED AT LINE 1296 IN SCAN.asm
+                    > USED AT LINE 1312 IN SCAN.asm
                     > USED AT LINE 1320 IN SCAN.asm
                     > USED AT LINE 1328 IN SCAN.asm
                     > USED AT LINE 1336 IN SCAN.asm
-                    > USED AT LINE 1344 IN SCAN.asm
-NUM_:               05E4 DEFINED AT LINE 945 IN SCAN.asm
-LAMBDA_:            05E7 DEFINED AT LINE 946 IN SCAN.asm
-A_:                 05E9 DEFINED AT LINE 949 IN SCAN.asm
-C_:                 05EC DEFINED AT LINE 951 IN SCAN.asm
-D_:                 05EF DEFINED AT LINE 953 IN SCAN.asm
-E_:                 05F2 DEFINED AT LINE 955 IN SCAN.asm
-F_:                 05F5 DEFINED AT LINE 957 IN SCAN.asm
-G_:                 05F8 DEFINED AT LINE 959 IN SCAN.asm
-I_:                 05FB DEFINED AT LINE 961 IN SCAN.asm
-K_:                 05FE DEFINED AT LINE 963 IN SCAN.asm
-L_:                 0601 DEFINED AT LINE 965 IN SCAN.asm
-M_:                 0604 DEFINED AT LINE 967 IN SCAN.asm
-N_:                 0607 DEFINED AT LINE 969 IN SCAN.asm
-O_:                 060A DEFINED AT LINE 971 IN SCAN.asm
-P_:                 060D DEFINED AT LINE 973 IN SCAN.asm
-R_:                 0610 DEFINED AT LINE 975 IN SCAN.asm
-S_:                 0613 DEFINED AT LINE 977 IN SCAN.asm
-U_:                 0616 DEFINED AT LINE 979 IN SCAN.asm
-W_:                 0619 DEFINED AT LINE 981 IN SCAN.asm
-X_:                 061C DEFINED AT LINE 983 IN SCAN.asm
-DIV_:               061F DEFINED AT LINE 986 IN SCAN.asm
-                    > USED AT LINE 1198 IN SCAN.asm
-LAMBDA:             0624 DEFINED AT LINE 997 IN SCAN.asm
-                    > USED AT LINE 947 IN SCAN.asm
-LAMBDA1:            062A DEFINED AT LINE 1001 IN SCAN.asm
-                    > USED AT LINE 1007 IN SCAN.asm
-LAMBDA2:            0632 DEFINED AT LINE 1008 IN SCAN.asm
-DIV:                0639 DEFINED AT LINE 1026 IN SCAN.asm
-                    > USED AT LINE 986 IN SCAN.asm
-DIV1:               0643 DEFINED AT LINE 1036 IN SCAN.asm
-                    > USED AT LINE 1049 IN SCAN.asm
-DIV2:               0650 DEFINED AT LINE 1045 IN SCAN.asm
-                    > USED AT LINE 1042 IN SCAN.asm
-DIV3:               0651 DEFINED AT LINE 1047 IN SCAN.asm
-                    > USED AT LINE 1044 IN SCAN.asm
-DIV4:               0656 DEFINED AT LINE 1052 IN SCAN.asm
-PAGE6:              0700 DEFINED AT LINE 1065 IN SCAN.asm
+NUM_:               05E4 DEFINED AT LINE 937 IN SCAN.asm
+LAMBDA_:            05E7 DEFINED AT LINE 938 IN SCAN.asm
+A_:                 05E9 DEFINED AT LINE 941 IN SCAN.asm
+C_:                 05EC DEFINED AT LINE 943 IN SCAN.asm
+D_:                 05EF DEFINED AT LINE 945 IN SCAN.asm
+E_:                 05F2 DEFINED AT LINE 947 IN SCAN.asm
+F_:                 05F5 DEFINED AT LINE 949 IN SCAN.asm
+G_:                 05F8 DEFINED AT LINE 951 IN SCAN.asm
+I_:                 05FB DEFINED AT LINE 953 IN SCAN.asm
+K_:                 05FE DEFINED AT LINE 955 IN SCAN.asm
+L_:                 0601 DEFINED AT LINE 957 IN SCAN.asm
+M_:                 0604 DEFINED AT LINE 959 IN SCAN.asm
+N_:                 0607 DEFINED AT LINE 961 IN SCAN.asm
+O_:                 060A DEFINED AT LINE 963 IN SCAN.asm
+P_:                 060D DEFINED AT LINE 965 IN SCAN.asm
+R_:                 0610 DEFINED AT LINE 967 IN SCAN.asm
+S_:                 0613 DEFINED AT LINE 969 IN SCAN.asm
+U_:                 0616 DEFINED AT LINE 971 IN SCAN.asm
+W_:                 0619 DEFINED AT LINE 973 IN SCAN.asm
+X_:                 061C DEFINED AT LINE 975 IN SCAN.asm
+DIV_:               061F DEFINED AT LINE 978 IN SCAN.asm
+                    > USED AT LINE 1190 IN SCAN.asm
+LAMBDA:             0624 DEFINED AT LINE 989 IN SCAN.asm
+                    > USED AT LINE 939 IN SCAN.asm
+LAMBDA1:            062A DEFINED AT LINE 993 IN SCAN.asm
+                    > USED AT LINE 999 IN SCAN.asm
+LAMBDA2:            0632 DEFINED AT LINE 1000 IN SCAN.asm
+DIV:                0639 DEFINED AT LINE 1018 IN SCAN.asm
+                    > USED AT LINE 978 IN SCAN.asm
+DIV1:               0643 DEFINED AT LINE 1028 IN SCAN.asm
+                    > USED AT LINE 1041 IN SCAN.asm
+DIV2:               0650 DEFINED AT LINE 1037 IN SCAN.asm
+                    > USED AT LINE 1034 IN SCAN.asm
+DIV3:               0651 DEFINED AT LINE 1039 IN SCAN.asm
+                    > USED AT LINE 1036 IN SCAN.asm
+DIV4:               0656 DEFINED AT LINE 1044 IN SCAN.asm
+PAGE6:              0700 DEFINED AT LINE 1057 IN SCAN.asm
                     > USED AT LINE 60 IN SCAN.asm
-ANOP_:              0700 DEFINED AT LINE 1067 IN SCAN.asm
-CFETCH_:            0702 DEFINED AT LINE 1070 IN SCAN.asm
-COMMENT_:           0709 DEFINED AT LINE 1077 IN SCAN.asm
-                    > USED AT LINE 1081 IN SCAN.asm
-CSTORE_:            0712 DEFINED AT LINE 1085 IN SCAN.asm
-EMIT_:              0717 DEFINED AT LINE 1091 IN SCAN.asm
-EXEC_:              071E DEFINED AT LINE 1097 IN SCAN.asm
-EXEC1:              0723 DEFINED AT LINE 1100 IN SCAN.asm
-                    > USED AT LINE 1098 IN SCAN.asm
-PROMPT_:            0726 DEFINED AT LINE 1105 IN SCAN.asm
-GO_:                072B DEFINED AT LINE 1110 IN SCAN.asm
-                    > USED AT LINE 1228 IN SCAN.asm
-GO1:                072C DEFINED AT LINE 1112 IN SCAN.asm
-                    > USED AT LINE 771 IN SCAN.asm
-GO2:                073B DEFINED AT LINE 1122 IN SCAN.asm
-                    > USED AT LINE 1120 IN SCAN.asm
-GO3:                073E DEFINED AT LINE 1125 IN SCAN.asm
-                    > USED AT LINE 1115 IN SCAN.asm
-INPORT_:            0740 DEFINED AT LINE 1128 IN SCAN.asm
-NEWLN_:             074B DEFINED AT LINE 1138 IN SCAN.asm
-OUTPORT_:           0750 DEFINED AT LINE 1142 IN SCAN.asm
-PRNSTR_:            0759 DEFINED AT LINE 1151 IN SCAN.asm
-PRNSTR:             0759 DEFINED AT LINE 1152 IN SCAN.asm
-RPUSH_:             075F DEFINED AT LINE 1158 IN SCAN.asm
-RPOP_:              0765 DEFINED AT LINE 1163 IN SCAN.asm
-A:                  076B DEFINED AT LINE 1172 IN SCAN.asm
+ANOP_:              0700 DEFINED AT LINE 1059 IN SCAN.asm
+CFETCH_:            0702 DEFINED AT LINE 1062 IN SCAN.asm
+COMMENT_:           0709 DEFINED AT LINE 1069 IN SCAN.asm
+                    > USED AT LINE 1073 IN SCAN.asm
+CSTORE_:            0712 DEFINED AT LINE 1077 IN SCAN.asm
+EMIT_:              0717 DEFINED AT LINE 1083 IN SCAN.asm
+EXEC_:              071E DEFINED AT LINE 1089 IN SCAN.asm
+EXEC1:              0723 DEFINED AT LINE 1092 IN SCAN.asm
+                    > USED AT LINE 1090 IN SCAN.asm
+PROMPT_:            0726 DEFINED AT LINE 1097 IN SCAN.asm
+GO_:                072B DEFINED AT LINE 1102 IN SCAN.asm
+                    > USED AT LINE 1220 IN SCAN.asm
+GO1:                072C DEFINED AT LINE 1104 IN SCAN.asm
+                    > USED AT LINE 763 IN SCAN.asm
+GO2:                073B DEFINED AT LINE 1114 IN SCAN.asm
+                    > USED AT LINE 1112 IN SCAN.asm
+GO3:                073E DEFINED AT LINE 1117 IN SCAN.asm
+                    > USED AT LINE 1107 IN SCAN.asm
+INPORT_:            0740 DEFINED AT LINE 1120 IN SCAN.asm
+NEWLN_:             074B DEFINED AT LINE 1130 IN SCAN.asm
+OUTPORT_:           0750 DEFINED AT LINE 1134 IN SCAN.asm
+PRNSTR_:            0759 DEFINED AT LINE 1143 IN SCAN.asm
+PRNSTR:             0759 DEFINED AT LINE 1144 IN SCAN.asm
+RPUSH_:             075F DEFINED AT LINE 1150 IN SCAN.asm
+RPOP_:              0765 DEFINED AT LINE 1155 IN SCAN.asm
+A:                  076B DEFINED AT LINE 1164 IN SCAN.asm
                     > USED AT LINE 296 IN IOSerial.asm
                     > USED AT LINE 298 IN IOSerial.asm
                     > USED AT LINE 299 IN IOSerial.asm
@@ -2352,119 +2345,124 @@ A:                  076B DEFINED AT LINE 1172 IN SCAN.asm
                     > USED AT LINE 585 IN SCAN.asm
                     > USED AT LINE 586 IN SCAN.asm
                     > USED AT LINE 587 IN SCAN.asm
-                    > USED AT LINE 632 IN SCAN.asm
-                    > USED AT LINE 635 IN SCAN.asm
+                    > USED AT LINE 594 IN SCAN.asm
+                    > USED AT LINE 596 IN SCAN.asm
+                    > USED AT LINE 597 IN SCAN.asm
+                    > USED AT LINE 597 IN SCAN.asm
+                    > USED AT LINE 599 IN SCAN.asm
+                    > USED AT LINE 624 IN SCAN.asm
+                    > USED AT LINE 627 IN SCAN.asm
+                    > USED AT LINE 634 IN SCAN.asm
+                    > USED AT LINE 640 IN SCAN.asm
                     > USED AT LINE 642 IN SCAN.asm
-                    > USED AT LINE 648 IN SCAN.asm
-                    > USED AT LINE 650 IN SCAN.asm
-                    > USED AT LINE 655 IN SCAN.asm
-                    > USED AT LINE 661 IN SCAN.asm
-                    > USED AT LINE 664 IN SCAN.asm
-                    > USED AT LINE 666 IN SCAN.asm
-                    > USED AT LINE 722 IN SCAN.asm
-                    > USED AT LINE 724 IN SCAN.asm
-                    > USED AT LINE 725 IN SCAN.asm
+                    > USED AT LINE 647 IN SCAN.asm
+                    > USED AT LINE 653 IN SCAN.asm
+                    > USED AT LINE 656 IN SCAN.asm
+                    > USED AT LINE 658 IN SCAN.asm
+                    > USED AT LINE 714 IN SCAN.asm
+                    > USED AT LINE 716 IN SCAN.asm
+                    > USED AT LINE 717 IN SCAN.asm
+                    > USED AT LINE 720 IN SCAN.asm
                     > USED AT LINE 728 IN SCAN.asm
-                    > USED AT LINE 736 IN SCAN.asm
-                    > USED AT LINE 738 IN SCAN.asm
+                    > USED AT LINE 730 IN SCAN.asm
+                    > USED AT LINE 731 IN SCAN.asm
                     > USED AT LINE 739 IN SCAN.asm
-                    > USED AT LINE 747 IN SCAN.asm
-                    > USED AT LINE 749 IN SCAN.asm
-                    > USED AT LINE 750 IN SCAN.asm
-                    > USED AT LINE 766 IN SCAN.asm
-                    > USED AT LINE 778 IN SCAN.asm
-                    > USED AT LINE 821 IN SCAN.asm
+                    > USED AT LINE 741 IN SCAN.asm
+                    > USED AT LINE 742 IN SCAN.asm
+                    > USED AT LINE 758 IN SCAN.asm
+                    > USED AT LINE 770 IN SCAN.asm
+                    > USED AT LINE 813 IN SCAN.asm
+                    > USED AT LINE 883 IN SCAN.asm
                     > USED AT LINE 891 IN SCAN.asm
-                    > USED AT LINE 899 IN SCAN.asm
-                    > USED AT LINE 916 IN SCAN.asm
-                    > USED AT LINE 933 IN SCAN.asm
-                    > USED AT LINE 940 IN SCAN.asm
-                    > USED AT LINE 950 IN SCAN.asm
-                    > USED AT LINE 1002 IN SCAN.asm
-                    > USED AT LINE 1004 IN SCAN.asm
-                    > USED AT LINE 1034 IN SCAN.asm
-                    > USED AT LINE 1048 IN SCAN.asm
-                    > USED AT LINE 1079 IN SCAN.asm
-                    > USED AT LINE 1093 IN SCAN.asm
-                    > USED AT LINE 1113 IN SCAN.asm
-                    > USED AT LINE 1118 IN SCAN.asm
-                    > USED AT LINE 1130 IN SCAN.asm
-                    > USED AT LINE 1134 IN SCAN.asm
-                    > USED AT LINE 1174 IN SCAN.asm
-                    > USED AT LINE 1184 IN SCAN.asm
-                    > USED AT LINE 1194 IN SCAN.asm
+                    > USED AT LINE 908 IN SCAN.asm
+                    > USED AT LINE 925 IN SCAN.asm
+                    > USED AT LINE 932 IN SCAN.asm
+                    > USED AT LINE 942 IN SCAN.asm
+                    > USED AT LINE 994 IN SCAN.asm
+                    > USED AT LINE 996 IN SCAN.asm
+                    > USED AT LINE 1026 IN SCAN.asm
+                    > USED AT LINE 1040 IN SCAN.asm
+                    > USED AT LINE 1071 IN SCAN.asm
+                    > USED AT LINE 1085 IN SCAN.asm
+                    > USED AT LINE 1105 IN SCAN.asm
+                    > USED AT LINE 1110 IN SCAN.asm
+                    > USED AT LINE 1122 IN SCAN.asm
+                    > USED AT LINE 1126 IN SCAN.asm
+                    > USED AT LINE 1166 IN SCAN.asm
+                    > USED AT LINE 1176 IN SCAN.asm
+                    > USED AT LINE 1186 IN SCAN.asm
+                    > USED AT LINE 1200 IN SCAN.asm
                     > USED AT LINE 1208 IN SCAN.asm
                     > USED AT LINE 1216 IN SCAN.asm
-                    > USED AT LINE 1224 IN SCAN.asm
-                    > USED AT LINE 1236 IN SCAN.asm
+                    > USED AT LINE 1228 IN SCAN.asm
+                    > USED AT LINE 1239 IN SCAN.asm
                     > USED AT LINE 1247 IN SCAN.asm
-                    > USED AT LINE 1255 IN SCAN.asm
-                    > USED AT LINE 1265 IN SCAN.asm
+                    > USED AT LINE 1257 IN SCAN.asm
+                    > USED AT LINE 1267 IN SCAN.asm
                     > USED AT LINE 1275 IN SCAN.asm
-                    > USED AT LINE 1283 IN SCAN.asm
-                    > USED AT LINE 1293 IN SCAN.asm
+                    > USED AT LINE 1285 IN SCAN.asm
+                    > USED AT LINE 1292 IN SCAN.asm
                     > USED AT LINE 1300 IN SCAN.asm
-                    > USED AT LINE 1308 IN SCAN.asm
+                    > USED AT LINE 1316 IN SCAN.asm
                     > USED AT LINE 1324 IN SCAN.asm
                     > USED AT LINE 1332 IN SCAN.asm
-                    > USED AT LINE 1340 IN SCAN.asm
-                    > USED AT LINE 1377 IN SCAN.asm
-                    > USED AT LINE 1386 IN SCAN.asm
+                    > USED AT LINE 1369 IN SCAN.asm
+                    > USED AT LINE 1378 IN SCAN.asm
+                    > USED AT LINE 1398 IN SCAN.asm
+                    > USED AT LINE 1403 IN SCAN.asm
+                    > USED AT LINE 1404 IN SCAN.asm
+                    > USED AT LINE 1405 IN SCAN.asm
                     > USED AT LINE 1406 IN SCAN.asm
-                    > USED AT LINE 1411 IN SCAN.asm
-                    > USED AT LINE 1412 IN SCAN.asm
-                    > USED AT LINE 1413 IN SCAN.asm
-                    > USED AT LINE 1414 IN SCAN.asm
-                    > USED AT LINE 1415 IN SCAN.asm
-                    > USED AT LINE 1418 IN SCAN.asm
-                    > USED AT LINE 1443 IN SCAN.asm
-                    > USED AT LINE 1444 IN SCAN.asm
-                    > USED AT LINE 1456 IN SCAN.asm
-                    > USED AT LINE 1457 IN SCAN.asm
-                    > USED AT LINE 1473 IN SCAN.asm
-                    > USED AT LINE 1474 IN SCAN.asm
-C:                  077B DEFINED AT LINE 1182 IN SCAN.asm
+                    > USED AT LINE 1407 IN SCAN.asm
+                    > USED AT LINE 1410 IN SCAN.asm
+                    > USED AT LINE 1435 IN SCAN.asm
+                    > USED AT LINE 1436 IN SCAN.asm
+                    > USED AT LINE 1448 IN SCAN.asm
+                    > USED AT LINE 1449 IN SCAN.asm
+                    > USED AT LINE 1465 IN SCAN.asm
+                    > USED AT LINE 1466 IN SCAN.asm
+C:                  077B DEFINED AT LINE 1174 IN SCAN.asm
                     > USED AT LINE 410 IN SCAN.asm
                     > USED AT LINE 534 IN SCAN.asm
                     > USED AT LINE 536 IN SCAN.asm
-                    > USED AT LINE 630 IN SCAN.asm
-                    > USED AT LINE 636 IN SCAN.asm
-                    > USED AT LINE 640 IN SCAN.asm
-                    > USED AT LINE 655 IN SCAN.asm
-                    > USED AT LINE 661 IN SCAN.asm
-                    > USED AT LINE 952 IN SCAN.asm
-                    > USED AT LINE 1031 IN SCAN.asm
-                    > USED AT LINE 1037 IN SCAN.asm
-                    > USED AT LINE 1042 IN SCAN.asm
+                    > USED AT LINE 622 IN SCAN.asm
+                    > USED AT LINE 628 IN SCAN.asm
+                    > USED AT LINE 632 IN SCAN.asm
+                    > USED AT LINE 647 IN SCAN.asm
+                    > USED AT LINE 653 IN SCAN.asm
+                    > USED AT LINE 944 IN SCAN.asm
+                    > USED AT LINE 1023 IN SCAN.asm
+                    > USED AT LINE 1029 IN SCAN.asm
+                    > USED AT LINE 1034 IN SCAN.asm
+                    > USED AT LINE 1035 IN SCAN.asm
                     > USED AT LINE 1043 IN SCAN.asm
-                    > USED AT LINE 1051 IN SCAN.asm
-                    > USED AT LINE 1130 IN SCAN.asm
-                    > USED AT LINE 1131 IN SCAN.asm
-                    > USED AT LINE 1132 IN SCAN.asm
-                    > USED AT LINE 1134 IN SCAN.asm
-                    > USED AT LINE 1144 IN SCAN.asm
-                    > USED AT LINE 1145 IN SCAN.asm
-                    > USED AT LINE 1147 IN SCAN.asm
-                    > USED AT LINE 1148 IN SCAN.asm
-                    > USED AT LINE 1374 IN SCAN.asm
-                    > USED AT LINE 1420 IN SCAN.asm
-                    > USED AT LINE 1449 IN SCAN.asm
-D:                  078B DEFINED AT LINE 1192 IN SCAN.asm
+                    > USED AT LINE 1122 IN SCAN.asm
+                    > USED AT LINE 1123 IN SCAN.asm
+                    > USED AT LINE 1124 IN SCAN.asm
+                    > USED AT LINE 1126 IN SCAN.asm
+                    > USED AT LINE 1136 IN SCAN.asm
+                    > USED AT LINE 1137 IN SCAN.asm
+                    > USED AT LINE 1139 IN SCAN.asm
+                    > USED AT LINE 1140 IN SCAN.asm
+                    > USED AT LINE 1366 IN SCAN.asm
+                    > USED AT LINE 1412 IN SCAN.asm
+                    > USED AT LINE 1441 IN SCAN.asm
+D:                  078B DEFINED AT LINE 1184 IN SCAN.asm
                     > USED AT LINE 438 IN SCAN.asm
                     > USED AT LINE 567 IN SCAN.asm
-                    > USED AT LINE 725 IN SCAN.asm
-                    > USED AT LINE 739 IN SCAN.asm
-                    > USED AT LINE 750 IN SCAN.asm
-                    > USED AT LINE 770 IN SCAN.asm
-                    > USED AT LINE 812 IN SCAN.asm
-                    > USED AT LINE 873 IN SCAN.asm
-                    > USED AT LINE 954 IN SCAN.asm
-                    > USED AT LINE 1050 IN SCAN.asm
-                    > USED AT LINE 1072 IN SCAN.asm
-                    > USED AT LINE 1113 IN SCAN.asm
-                    > USED AT LINE 1381 IN SCAN.asm
-                    > USED AT LINE 1426 IN SCAN.asm
-E:                  07A5 DEFINED AT LINE 1206 IN SCAN.asm
+                    > USED AT LINE 717 IN SCAN.asm
+                    > USED AT LINE 731 IN SCAN.asm
+                    > USED AT LINE 742 IN SCAN.asm
+                    > USED AT LINE 762 IN SCAN.asm
+                    > USED AT LINE 804 IN SCAN.asm
+                    > USED AT LINE 865 IN SCAN.asm
+                    > USED AT LINE 946 IN SCAN.asm
+                    > USED AT LINE 1042 IN SCAN.asm
+                    > USED AT LINE 1064 IN SCAN.asm
+                    > USED AT LINE 1105 IN SCAN.asm
+                    > USED AT LINE 1373 IN SCAN.asm
+                    > USED AT LINE 1418 IN SCAN.asm
+E:                  07A5 DEFINED AT LINE 1198 IN SCAN.asm
                     > USED AT LINE 397 IN SCAN.asm
                     > USED AT LINE 434 IN SCAN.asm
                     > USED AT LINE 435 IN SCAN.asm
@@ -2473,156 +2471,158 @@ E:                  07A5 DEFINED AT LINE 1206 IN SCAN.asm
                     > USED AT LINE 577 IN SCAN.asm
                     > USED AT LINE 580 IN SCAN.asm
                     > USED AT LINE 588 IN SCAN.asm
-                    > USED AT LINE 619 IN SCAN.asm
-                    > USED AT LINE 621 IN SCAN.asm
+                    > USED AT LINE 611 IN SCAN.asm
+                    > USED AT LINE 613 IN SCAN.asm
+                    > USED AT LINE 675 IN SCAN.asm
+                    > USED AT LINE 677 IN SCAN.asm
+                    > USED AT LINE 680 IN SCAN.asm
                     > USED AT LINE 683 IN SCAN.asm
-                    > USED AT LINE 685 IN SCAN.asm
-                    > USED AT LINE 688 IN SCAN.asm
-                    > USED AT LINE 691 IN SCAN.asm
-                    > USED AT LINE 700 IN SCAN.asm
-                    > USED AT LINE 710 IN SCAN.asm
-                    > USED AT LINE 722 IN SCAN.asm
-                    > USED AT LINE 736 IN SCAN.asm
-                    > USED AT LINE 747 IN SCAN.asm
-                    > USED AT LINE 768 IN SCAN.asm
-                    > USED AT LINE 810 IN SCAN.asm
-                    > USED AT LINE 871 IN SCAN.asm
+                    > USED AT LINE 692 IN SCAN.asm
+                    > USED AT LINE 702 IN SCAN.asm
+                    > USED AT LINE 714 IN SCAN.asm
+                    > USED AT LINE 728 IN SCAN.asm
+                    > USED AT LINE 739 IN SCAN.asm
+                    > USED AT LINE 760 IN SCAN.asm
+                    > USED AT LINE 802 IN SCAN.asm
+                    > USED AT LINE 863 IN SCAN.asm
+                    > USED AT LINE 948 IN SCAN.asm
+                    > USED AT LINE 1043 IN SCAN.asm
+                    > USED AT LINE 1065 IN SCAN.asm
+                    > USED AT LINE 1080 IN SCAN.asm
+                    > USED AT LINE 1106 IN SCAN.asm
+                    > USED AT LINE 1136 IN SCAN.asm
+                    > USED AT LINE 1140 IN SCAN.asm
+                    > USED AT LINE 1372 IN SCAN.asm
+                    > USED AT LINE 1417 IN SCAN.asm
+F:                  07B0 DEFINED AT LINE 1206 IN SCAN.asm
+                    > USED AT LINE 950 IN SCAN.asm
+G:                  07BB DEFINED AT LINE 1214 IN SCAN.asm
+                    > USED AT LINE 952 IN SCAN.asm
+I:                  07D0 DEFINED AT LINE 1226 IN SCAN.asm
+                    > USED AT LINE 954 IN SCAN.asm
+K:                  07E0 DEFINED AT LINE 1236 IN SCAN.asm
                     > USED AT LINE 956 IN SCAN.asm
-                    > USED AT LINE 1051 IN SCAN.asm
-                    > USED AT LINE 1073 IN SCAN.asm
-                    > USED AT LINE 1088 IN SCAN.asm
-                    > USED AT LINE 1114 IN SCAN.asm
-                    > USED AT LINE 1144 IN SCAN.asm
-                    > USED AT LINE 1148 IN SCAN.asm
-                    > USED AT LINE 1380 IN SCAN.asm
-                    > USED AT LINE 1425 IN SCAN.asm
-F:                  07B0 DEFINED AT LINE 1214 IN SCAN.asm
-                    > USED AT LINE 958 IN SCAN.asm
-G:                  07BB DEFINED AT LINE 1222 IN SCAN.asm
-                    > USED AT LINE 960 IN SCAN.asm
-I:                  07D0 DEFINED AT LINE 1234 IN SCAN.asm
-                    > USED AT LINE 962 IN SCAN.asm
-K:                  07E0 DEFINED AT LINE 1244 IN SCAN.asm
-                    > USED AT LINE 964 IN SCAN.asm
-L:                  07EE DEFINED AT LINE 1253 IN SCAN.asm
+L:                  07EE DEFINED AT LINE 1245 IN SCAN.asm
                     > USED AT LINE 432 IN SCAN.asm
                     > USED AT LINE 433 IN SCAN.asm
                     > USED AT LINE 501 IN SCAN.asm
                     > USED AT LINE 503 IN SCAN.asm
                     > USED AT LINE 582 IN SCAN.asm
                     > USED AT LINE 583 IN SCAN.asm
-                    > USED AT LINE 650 IN SCAN.asm
-                    > USED AT LINE 723 IN SCAN.asm
-                    > USED AT LINE 724 IN SCAN.asm
-                    > USED AT LINE 737 IN SCAN.asm
-                    > USED AT LINE 738 IN SCAN.asm
-                    > USED AT LINE 748 IN SCAN.asm
-                    > USED AT LINE 749 IN SCAN.asm
-                    > USED AT LINE 821 IN SCAN.asm
-                    > USED AT LINE 864 IN SCAN.asm
-                    > USED AT LINE 966 IN SCAN.asm
-                    > USED AT LINE 1031 IN SCAN.asm
-                    > USED AT LINE 1093 IN SCAN.asm
-                    > USED AT LINE 1131 IN SCAN.asm
-                    > USED AT LINE 1132 IN SCAN.asm
-                    > USED AT LINE 1145 IN SCAN.asm
-                    > USED AT LINE 1147 IN SCAN.asm
-                    > USED AT LINE 1374 IN SCAN.asm
-                    > USED AT LINE 1411 IN SCAN.asm
-                    > USED AT LINE 1412 IN SCAN.asm
-                    > USED AT LINE 1425 IN SCAN.asm
-                    > USED AT LINE 1456 IN SCAN.asm
-                    > USED AT LINE 1457 IN SCAN.asm
-                    > USED AT LINE 1482 IN SCAN.asm
-                    > USED AT LINE 1486 IN SCAN.asm
-M:                  07FE DEFINED AT LINE 1263 IN SCAN.asm
-                    > USED AT LINE 919 IN SCAN.asm
-                    > USED AT LINE 935 IN SCAN.asm
-                    > USED AT LINE 968 IN SCAN.asm
-N:                  080E DEFINED AT LINE 1273 IN SCAN.asm
-                    > USED AT LINE 970 IN SCAN.asm
-O:                  0819 DEFINED AT LINE 1281 IN SCAN.asm
-                    > USED AT LINE 972 IN SCAN.asm
-P:                  0829 DEFINED AT LINE 1291 IN SCAN.asm
-                    > USED AT LINE 974 IN SCAN.asm
-R:                  0834 DEFINED AT LINE 1298 IN SCAN.asm
-                    > USED AT LINE 976 IN SCAN.asm
-S:                  083F DEFINED AT LINE 1306 IN SCAN.asm
-                    > USED AT LINE 978 IN SCAN.asm
-U:                  085E DEFINED AT LINE 1322 IN SCAN.asm
-                    > USED AT LINE 980 IN SCAN.asm
-W:                  0869 DEFINED AT LINE 1330 IN SCAN.asm
-                    > USED AT LINE 982 IN SCAN.asm
-X:                  0874 DEFINED AT LINE 1338 IN SCAN.asm
-                    > USED AT LINE 984 IN SCAN.asm
-                    > USED AT LINE 1245 IN SCAN.asm
-CASE_:              087F DEFINED AT LINE 1346 IN SCAN.asm
-                    > USED AT LINE 1186 IN SCAN.asm
-CLOSURE_:           087F DEFINED AT LINE 1347 IN SCAN.asm
-                    > USED AT LINE 1188 IN SCAN.asm
-DEF_:               087F DEFINED AT LINE 1348 IN SCAN.asm
-                    > USED AT LINE 1196 IN SCAN.asm
-FILTER_:            087F DEFINED AT LINE 1349 IN SCAN.asm
-                    > USED AT LINE 1218 IN SCAN.asm
-GET_:               087F DEFINED AT LINE 1350 IN SCAN.asm
-                    > USED AT LINE 1226 IN SCAN.asm
-IF_:                087F DEFINED AT LINE 1351 IN SCAN.asm
-                    > USED AT LINE 1238 IN SCAN.asm
-LET_:               087F DEFINED AT LINE 1352 IN SCAN.asm
-                    > USED AT LINE 1257 IN SCAN.asm
-MAP_:               087F DEFINED AT LINE 1353 IN SCAN.asm
-                    > USED AT LINE 1267 IN SCAN.asm
-PRINT_:             087F DEFINED AT LINE 1354 IN SCAN.asm
-                    > USED AT LINE 1295 IN SCAN.asm
-SCAN_:              087F DEFINED AT LINE 1355 IN SCAN.asm
-                    > USED AT LINE 1310 IN SCAN.asm
-SET_:               087F DEFINED AT LINE 1356 IN SCAN.asm
-                    > USED AT LINE 1312 IN SCAN.asm
-SHIFT_:             087F DEFINED AT LINE 1357 IN SCAN.asm
-                    > USED AT LINE 1314 IN SCAN.asm
-UNDROP_:            087F DEFINED AT LINE 1358 IN SCAN.asm
-                    > USED AT LINE 1326 IN SCAN.asm
-WHILE_:             087F DEFINED AT LINE 1359 IN SCAN.asm
-                    > USED AT LINE 1334 IN SCAN.asm
-MUL:                0881 DEFINED AT LINE 1369 IN SCAN.asm
-                    > USED AT LINE 825 IN SCAN.asm
-MUL2:               088B DEFINED AT LINE 1378 IN SCAN.asm
-                    > USED AT LINE 1387 IN SCAN.asm
-NUM:                089D DEFINED AT LINE 1404 IN SCAN.asm
-                    > USED AT LINE 945 IN SCAN.asm
-NUM1:               08A1 DEFINED AT LINE 1408 IN SCAN.asm
-                    > USED AT LINE 1432 IN SCAN.asm
-NUM2:               08BB DEFINED AT LINE 1434 IN SCAN.asm
-                    > USED AT LINE 1420 IN SCAN.asm
-                    > USED AT LINE 1422 IN SCAN.asm
-                    > USED AT LINE 1449 IN SCAN.asm
-                    > USED AT LINE 1451 IN SCAN.asm
-HEX:                08BF DEFINED AT LINE 1439 IN SCAN.asm
-                    > USED AT LINE 816 IN SCAN.asm
-HEX1:               08C2 DEFINED AT LINE 1441 IN SCAN.asm
-                    > USED AT LINE 1458 IN SCAN.asm
-HEX2:               08CA DEFINED AT LINE 1447 IN SCAN.asm
-                    > USED AT LINE 1445 IN SCAN.asm
-PROMPT:             08DC DEFINED AT LINE 1464 IN SCAN.asm
-                    > USED AT LINE 391 IN SCAN.asm
-                    > USED AT LINE 1106 IN SCAN.asm
-PUTSTR0:            08E5 DEFINED AT LINE 1469 IN SCAN.asm
-                    > USED AT LINE 1475 IN SCAN.asm
-PUTSTR:             08E9 DEFINED AT LINE 1472 IN SCAN.asm
-                    > USED AT LINE 561 IN SCAN.asm
-                    > USED AT LINE 1154 IN SCAN.asm
-RPUSH:              08EE DEFINED AT LINE 1478 IN SCAN.asm
-                    > USED AT LINE 554 IN SCAN.asm
-                    > USED AT LINE 1121 IN SCAN.asm
-                    > USED AT LINE 1160 IN SCAN.asm
-RPOP:               08F9 DEFINED AT LINE 1485 IN SCAN.asm
-                    > USED AT LINE 802 IN SCAN.asm
-                    > USED AT LINE 840 IN SCAN.asm
-                    > USED AT LINE 1164 IN SCAN.asm
-RPOP2:              0903 DEFINED AT LINE 1490 IN SCAN.asm
-CRLF:               0904 DEFINED AT LINE 1493 IN SCAN.asm
-                    > USED AT LINE 464 IN SCAN.asm
+                    > USED AT LINE 595 IN SCAN.asm
+                    > USED AT LINE 596 IN SCAN.asm
+                    > USED AT LINE 642 IN SCAN.asm
+                    > USED AT LINE 715 IN SCAN.asm
+                    > USED AT LINE 716 IN SCAN.asm
+                    > USED AT LINE 729 IN SCAN.asm
+                    > USED AT LINE 730 IN SCAN.asm
+                    > USED AT LINE 740 IN SCAN.asm
+                    > USED AT LINE 741 IN SCAN.asm
+                    > USED AT LINE 813 IN SCAN.asm
+                    > USED AT LINE 856 IN SCAN.asm
+                    > USED AT LINE 958 IN SCAN.asm
+                    > USED AT LINE 1023 IN SCAN.asm
+                    > USED AT LINE 1085 IN SCAN.asm
+                    > USED AT LINE 1123 IN SCAN.asm
+                    > USED AT LINE 1124 IN SCAN.asm
+                    > USED AT LINE 1137 IN SCAN.asm
                     > USED AT LINE 1139 IN SCAN.asm
+                    > USED AT LINE 1366 IN SCAN.asm
+                    > USED AT LINE 1403 IN SCAN.asm
+                    > USED AT LINE 1404 IN SCAN.asm
+                    > USED AT LINE 1417 IN SCAN.asm
+                    > USED AT LINE 1448 IN SCAN.asm
+                    > USED AT LINE 1449 IN SCAN.asm
+                    > USED AT LINE 1474 IN SCAN.asm
+                    > USED AT LINE 1478 IN SCAN.asm
+M:                  07FE DEFINED AT LINE 1255 IN SCAN.asm
+                    > USED AT LINE 911 IN SCAN.asm
+                    > USED AT LINE 927 IN SCAN.asm
+                    > USED AT LINE 960 IN SCAN.asm
+N:                  080E DEFINED AT LINE 1265 IN SCAN.asm
+                    > USED AT LINE 962 IN SCAN.asm
+O:                  0819 DEFINED AT LINE 1273 IN SCAN.asm
+                    > USED AT LINE 964 IN SCAN.asm
+P:                  0829 DEFINED AT LINE 1283 IN SCAN.asm
+                    > USED AT LINE 966 IN SCAN.asm
+R:                  0834 DEFINED AT LINE 1290 IN SCAN.asm
+                    > USED AT LINE 968 IN SCAN.asm
+S:                  083F DEFINED AT LINE 1298 IN SCAN.asm
+                    > USED AT LINE 970 IN SCAN.asm
+U:                  085E DEFINED AT LINE 1314 IN SCAN.asm
+                    > USED AT LINE 972 IN SCAN.asm
+W:                  0869 DEFINED AT LINE 1322 IN SCAN.asm
+                    > USED AT LINE 974 IN SCAN.asm
+X:                  0874 DEFINED AT LINE 1330 IN SCAN.asm
+                    > USED AT LINE 976 IN SCAN.asm
+                    > USED AT LINE 1237 IN SCAN.asm
+CASE_:              087F DEFINED AT LINE 1338 IN SCAN.asm
+                    > USED AT LINE 1178 IN SCAN.asm
+CLOSURE_:           087F DEFINED AT LINE 1339 IN SCAN.asm
+                    > USED AT LINE 1180 IN SCAN.asm
+DEF_:               087F DEFINED AT LINE 1340 IN SCAN.asm
+                    > USED AT LINE 1188 IN SCAN.asm
+FILTER_:            087F DEFINED AT LINE 1341 IN SCAN.asm
+                    > USED AT LINE 1210 IN SCAN.asm
+GET_:               087F DEFINED AT LINE 1342 IN SCAN.asm
+                    > USED AT LINE 1218 IN SCAN.asm
+IF_:                087F DEFINED AT LINE 1343 IN SCAN.asm
+                    > USED AT LINE 1230 IN SCAN.asm
+LET_:               087F DEFINED AT LINE 1344 IN SCAN.asm
+                    > USED AT LINE 1249 IN SCAN.asm
+MAP_:               087F DEFINED AT LINE 1345 IN SCAN.asm
+                    > USED AT LINE 1259 IN SCAN.asm
+PRINT_:             087F DEFINED AT LINE 1346 IN SCAN.asm
+                    > USED AT LINE 1287 IN SCAN.asm
+SCAN_:              087F DEFINED AT LINE 1347 IN SCAN.asm
+                    > USED AT LINE 1302 IN SCAN.asm
+SET_:               087F DEFINED AT LINE 1348 IN SCAN.asm
+                    > USED AT LINE 1304 IN SCAN.asm
+SHIFT_:             087F DEFINED AT LINE 1349 IN SCAN.asm
+                    > USED AT LINE 1306 IN SCAN.asm
+UNDROP_:            087F DEFINED AT LINE 1350 IN SCAN.asm
+                    > USED AT LINE 1318 IN SCAN.asm
+WHILE_:             087F DEFINED AT LINE 1351 IN SCAN.asm
+                    > USED AT LINE 1326 IN SCAN.asm
+MUL:                0881 DEFINED AT LINE 1361 IN SCAN.asm
+                    > USED AT LINE 817 IN SCAN.asm
+MUL2:               088B DEFINED AT LINE 1370 IN SCAN.asm
+                    > USED AT LINE 1379 IN SCAN.asm
+NUM:                089D DEFINED AT LINE 1396 IN SCAN.asm
+                    > USED AT LINE 937 IN SCAN.asm
+NUM1:               08A1 DEFINED AT LINE 1400 IN SCAN.asm
+                    > USED AT LINE 1424 IN SCAN.asm
+NUM2:               08BB DEFINED AT LINE 1426 IN SCAN.asm
+                    > USED AT LINE 1412 IN SCAN.asm
+                    > USED AT LINE 1414 IN SCAN.asm
+                    > USED AT LINE 1441 IN SCAN.asm
+                    > USED AT LINE 1443 IN SCAN.asm
+HEX:                08BF DEFINED AT LINE 1431 IN SCAN.asm
+                    > USED AT LINE 808 IN SCAN.asm
+HEX1:               08C2 DEFINED AT LINE 1433 IN SCAN.asm
+                    > USED AT LINE 1450 IN SCAN.asm
+HEX2:               08CA DEFINED AT LINE 1439 IN SCAN.asm
+                    > USED AT LINE 1437 IN SCAN.asm
+PROMPT:             08DC DEFINED AT LINE 1456 IN SCAN.asm
+                    > USED AT LINE 391 IN SCAN.asm
+                    > USED AT LINE 1098 IN SCAN.asm
+PUTSTR0:            08E5 DEFINED AT LINE 1461 IN SCAN.asm
+                    > USED AT LINE 1467 IN SCAN.asm
+PUTSTR:             08E9 DEFINED AT LINE 1464 IN SCAN.asm
+                    > USED AT LINE 561 IN SCAN.asm
+                    > USED AT LINE 1146 IN SCAN.asm
+RPUSH:              08EE DEFINED AT LINE 1470 IN SCAN.asm
+                    > USED AT LINE 554 IN SCAN.asm
+                    > USED AT LINE 1113 IN SCAN.asm
+                    > USED AT LINE 1152 IN SCAN.asm
+RPOP:               08F9 DEFINED AT LINE 1477 IN SCAN.asm
+                    > USED AT LINE 794 IN SCAN.asm
+                    > USED AT LINE 832 IN SCAN.asm
+                    > USED AT LINE 1156 IN SCAN.asm
+RPOP2:              0903 DEFINED AT LINE 1482 IN SCAN.asm
+CRLF:               0904 DEFINED AT LINE 1485 IN SCAN.asm
+                    > USED AT LINE 464 IN SCAN.asm
+                    > USED AT LINE 1131 IN SCAN.asm
 TIB:                1800 DEFINED AT LINE 3 IN ram.asm
                     > USED AT LINE 400 IN SCAN.asm
                     > USED AT LINE 447 IN SCAN.asm
@@ -2693,8 +2693,8 @@ VNS:                1C86 DEFINED AT LINE 45 IN ram.asm
 VLASTDEF:           1C88 DEFINED AT LINE 46 IN ram.asm
 VALTPAGE:           1C8C DEFINED AT LINE 48 IN ram.asm
 VHEAPPTR:           1C8E DEFINED AT LINE 49 IN ram.asm
-                    > USED AT LINE 999 IN SCAN.asm
-                    > USED AT LINE 1010 IN SCAN.asm
+                    > USED AT LINE 991 IN SCAN.asm
+                    > USED AT LINE 1002 IN SCAN.asm
 MINTDATA:           1CC0 DEFINED AT LINE 73 IN ram.asm
                     > USED AT LINE 517 IN SCAN.asm
                     > USED AT LINE 581 IN SCAN.asm
