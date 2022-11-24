@@ -598,8 +598,8 @@ lookupRef3:
 ; limited to 127 levels
 ; **************************************************************************             
 
-nesting:                        ;=44
-        cp '`'
+nesting:                        ;
+        cp $22                  ; quote char
         jr nz,nesting1
         bit 7,e
         jr z,nesting1a
@@ -611,7 +611,7 @@ nesting1a:
 nesting1:
         bit 7,e             
         ret nz             
-        cp ':'
+        cp '{'
         jr z,nesting2
         cp '['
         jr z,nesting2
@@ -621,7 +621,7 @@ nesting2:
         inc e
         ret
 nesting3:
-        cp ';'
+        cp '}'
         jr z,nesting4
         cp ']'
         jr z,nesting4
@@ -810,7 +810,7 @@ sub_:       		        ; Subtract the value 2nd on stack from top of stack
         pop de              ;    
         pop hl              ;      Entry point for INVert
 sub2:   
-        and a               ;      Entry point for NEGate
+        or a                ;      Entry point for NEGate
         sbc hl,de           ; 15t
         push hl             ;    
         jp (iy)             ;   
@@ -1323,7 +1323,7 @@ mul2:
 ; push hl onto the stack and proceed to the dispatch routine.
 ; ********************************************************************************
          
-num:                                
+xxnum:                                
 		ld hl,$0000				    ; Clear hl to accept the number
 		ld a,(bc)				    ; Get numeral or -
         cp '-'
@@ -1370,6 +1370,47 @@ num3:
         push hl                     ; Put the number on the stack
         jp (iy)                     ; and process the next character
 
+
+
+
+num:
+		ld hl,$0000				    ; Clear hl to accept the number
+		ld a,(bc)				    ; Get numeral or -
+        cp '-'
+        jr nz,xnum0
+        inc bc                      ; no flags are affected
+xnum0:
+        ex af,af'                   ; save zero flag = 0 for later
+xnum1:
+        ld a,(bc)         
+        sub 30h           
+        jr c, xnum4                 ; not a number, exit loop      
+        inc bc            
+        ld d,h            
+        ld e,l            
+        add hl,hl         
+        add hl,hl         
+        add hl,de         
+        add hl,hl         
+        add a,l           
+        ld l,a            
+        jr nc,xnum1    
+        inc h             
+        jr xnum1      
+xnum4:
+        dec bc
+        ex af,af'                   ; restore zero flag
+        jr nz, xnum5
+        ex de,hl                    ; negate the value of hl
+        ld hl,0
+        or a                        ; jump to sub2
+        sbc hl,de              
+xnum5:
+        push hl                     ; Put the number on the stack
+        jp (iy)                     ; and process the next character
+
+
+
 hexnum:                                ;
 	    ld hl,0	    		        ; Clear hl to accept the number
 hexnum1:
@@ -1392,6 +1433,10 @@ hexnum2:
         jr  hexnum1
 
 prtdec:                           ;=34 ; removes leading zeros
+        ; ld a,h
+        ; or l
+        ; ld a, '0'
+        ; jp z, putchar
         bit 7,h
         jr z,prtdec0
         ld a,'-'
@@ -1402,9 +1447,9 @@ prtdec:                           ;=34 ; removes leading zeros
         sbc a,a  
         sub h  
         ld h,a
-prtdec0:                           ;=34 ; removes leading zeros
+prtdec0:                           
         push bc
-        ld bc,0
+        ld c,0                      ; leading zeros flag = false
         ld de,-10000
         call prtdec1
         ld de,-1000
@@ -1413,11 +1458,12 @@ prtdec0:                           ;=34 ; removes leading zeros
         call prtdec1
         ld e,-10
         call prtdec1
+        inc c                       ; flag = true for at least digit
         ld e,-1
         call prtdec1
         pop bc
         ret
-prtdec1:	                        ;=24 
+prtdec1:	                         
         ld b,'0'-1
 prtdec2:	    
         inc b
