@@ -1325,11 +1325,17 @@ mul2:
          
 num:                                
 		ld hl,$0000				    ; Clear hl to accept the number
-		ld a,(bc)				    ; Get the character which is a numeral or -
+		ld a,(bc)				    ; Get numeral or -
         cp '-'
-        ex af,af'                   ; save zero flag for later
+        jr nz,num0
+        ex af,af'                   ; save zero flag = 1 for later
         inc bc
         ld a,(bc)
+        jr num1
+num0:
+        ld d,a                      ; save a copy in d
+        ex af,af'                   ; save zero flag = 0 for later
+		ld a,d				        ; restore char
 num1:                               ; corrected KB 24/11/21
         sub $30                     ;       Form decimal digit
         add a,l                     ;       add into bottom of hl

@@ -8,14 +8,14 @@
     OR H
     JR Z,expect%%M
 
-    CALL printStr
+    CALL prtstr
     .cstr msg1,"\r\nActual: "
-    CALL printdec
+    CALL prtdec
 
-    CALL printStr
+    CALL prtstr
     .cstr "\r\nExpected: "
     LD HL,val1
-    CALL printdec
+    CALL prtdec
 
     HALT
     .cstr
