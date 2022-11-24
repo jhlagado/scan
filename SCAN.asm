@@ -20,7 +20,7 @@
         FALSE       EQU 0
         EMPTY       EQU 0		; for an empty macro, ctrl-<something>=macro, ie ctrl-h = backspace macros (in Siena)
 
-        mintDataSize      EQU 26*2*2	; a..z, a..z words
+        DATASIZE    EQU 26*2*2	; a..z, a..z words
 
 .macro LITDAT,len
         DB len
@@ -63,11 +63,11 @@ iAltVars:			            ; value copied into tables
 
 
 iOpcodes:
-        LITDAT 4		; macros for compression
-        DB lsb(exit_)    ;   NUL get least signif byte of address exit_
-        DB lsb(nop_)     ;   SOH 
-        DB lsb(nop_)     ;   STX 
-        DB lsb(etx_)     ;   ETX 
+        LITDAT 4		        ; macros for compression
+        DB lsb(exit_)           ; NUL 
+        DB lsb(nop_)            ; SOH 
+        DB lsb(nop_)            ; STX 
+        DB lsb(etx_)            ; ETX 
 
         LITDAT 29
         ; REPDAT 29, lsb(nop_)
@@ -108,14 +108,14 @@ iOpcodes:
         DB lsb(hexnum_) ;   #
         DB lsb(nop_)    ;   $            
         DB lsb(nop_)    ;   %            
-        DB lsb(and_)    ;   &
+        DB lsb(nop_)    ;   &
         DB lsb(nop_)    ;   '
         DB lsb(nop_)    ;   (        
         DB lsb(nop_)    ;   )
-        DB lsb(mul_)    ;   *            
+        DB lsb(nop_)    ;   *            
         DB lsb(add_)    ;   +
         DB lsb(nop_)    ;   ,            
-        DB lsb(sub_)    ;   -
+        DB lsb(num_)    ;   -
         DB lsb(dot_)    ;   .
         DB lsb(nop_)    ;   /	
 
@@ -135,9 +135,9 @@ iOpcodes:
         LITDAT 7
         DB lsb(nop_)    ;   :        
         DB lsb(nop_)    ;   ;
-        DB lsb(lt_)     ;   <
-        DB lsb(eq_)     ;   =            
-        DB lsb(gt_)     ;   >            
+        DB lsb(nop_)    ;   <
+        DB lsb(nop_)    ;   =            
+        DB lsb(nop_)    ;   >            
         DB lsb(nop_)    ;   ?   ( -- val )  read a char from input
         DB lsb(nop_)    ;   @       
 
@@ -504,21 +504,21 @@ next:                               ;=9
         ld h,msb(page4)             ;       Load h with the 1st page address
         jp (hl)                     ;       Jump to routine
 
-init:                           ;=68
+init:                               
         ld hl,LSTACK
-        ld (vLoopSP),hl         ; Loop stack pointer stored in memory
+        ld (vLoopSP),hl             ; Loop stack pointer stored in memory
         ld ix,RSTACK
-        ld iy,next		; iy provides a faster jump to next
+        ld iy,next		            ; iy provides a faster jump to next
         ld hl,ialtVars
         ld de,altVars
         ld bc,8 * 2
         ldir
         
-        ld hl,mintData          ; init namespaces to 0 using ldir
+        ld hl,data                  ; init namespaces to 0 using ldir
         ld de,hl
         inc de
         ld (hl),0
-        ld bc,mintDataSize
+        ld bc,DATASIZE
         ldir
 
 initOps:
@@ -578,7 +578,7 @@ lookupRef2:
 lookupRef3:
         add a,a
         add a,e
-        ld hl,mintData
+        ld hl,DATA
         add a,l
         ld l,a
         ld a,0
@@ -1323,12 +1323,14 @@ mul2:
 ; push hl onto the stack and proceed to the dispatch routine.
 ; ********************************************************************************
          
-num:                                ;=23
-		ld hl,$0000				    ;     Clear hl to accept the number
-		ld a,(bc)				    ;     Get the character which is a numeral
-        
+num:                                
+		ld hl,$0000				    ; Clear hl to accept the number
+		ld a,(bc)				    ; Get the character which is a numeral or -
+        cp '-'
+        ex af,af'                   ; save zero flag for later
+        inc bc
+        ld a,(bc)
 num1:                               ; corrected KB 24/11/21
-
         sub $30                     ;       Form decimal digit
         add a,l                     ;       add into bottom of hl
         ld  l,a                     ;   
@@ -1349,12 +1351,16 @@ num1:                               ; corrected KB 24/11/21
         add hl,hl                   ;        4X
         add hl,hl                   ;        8X
         add hl,de                   ;        2X  + 8X  = 10X
-                                    ; 52t cycles
-
         jr  num1
-                
 num2:
         dec bc
+        ex af,af'                   ; restore zero flag
+        jr nz, num3
+        ex de,hl
+        ld hl,0
+        or a
+        sbc hl,de              
+num3:
         push hl                     ; Put the number on the stack
         jp (iy)                     ; and process the next character
 

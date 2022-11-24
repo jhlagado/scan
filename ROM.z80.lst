@@ -539,7 +539,7 @@
 00C6                TRUE:     EQU   1   ; not FF, for Siena
 00C6                FALSE:    EQU   0   
 00C6                EMPTY:    EQU   0   ; for an empty macro, ctrl-<something>=macro, ie ctrl-h = backspace macros (in Siena)
-00C6                MINTDATASIZE:   EQU   26*2*2   ; a..z, a..z words
+00C6                DATASIZE:   EQU   26*2*2   ; a..z, a..z words
 00C6                .macro LITDAT,len
 00C6                             ; 
 00C6                 DB len
@@ -577,12 +577,12 @@
 018C   00 06                  DW   page6   ; g 256 bytes limits
 018E   28 1D                  DW   HEAP   ; h vHeapPtr \h start of the free mem
 0190                IOPCODES:      
-0190                          ;*Macro unroll:  LITDAT 4		; macros for compression
+0190                          ;*Macro unroll:  LITDAT 4		        ; macros for compression
 0190   04                     DB   4   ; macros for compression
-0191   4E                     DB   lsb(exit_)   ;   NUL get least signif byte of address exit_
-0192   6E                     DB   lsb(nop_)   ;   SOH
-0193   6E                     DB   lsb(nop_)   ;   STX
-0194   4B                     DB   lsb(etx_)   ;   ETX
+0191   4E                     DB   lsb(exit_)   ; NUL
+0192   6E                     DB   lsb(nop_)   ; SOH
+0193   6E                     DB   lsb(nop_)   ; STX
+0194   4B                     DB   lsb(etx_)   ; ETX
 0195                          ;*Macro unroll:  LITDAT 29
 0195   1D                     DB   29   
 0196                             ; REPDAT 29, lsb(nop_)
@@ -622,14 +622,14 @@
 01B6   5F                     DB   lsb(hexnum_)   ;   #
 01B7   6E                     DB   lsb(nop_)   ;   $
 01B8   6E                     DB   lsb(nop_)   ;   %
-01B9   00                     DB   lsb(and_)   ;   &
+01B9   6E                     DB   lsb(nop_)   ;   &
 01BA   6E                     DB   lsb(nop_)   ;   '
 01BB   6E                     DB   lsb(nop_)   ;   (
 01BC   6E                     DB   lsb(nop_)   ;   )
-01BD   6B                     DB   lsb(mul_)   ;   *
+01BD   6E                     DB   lsb(nop_)   ;   *
 01BE   22                     DB   lsb(add_)   ;   +
 01BF   6E                     DB   lsb(nop_)   ;   ,
-01C0   A5                     DB   lsb(sub_)   ;   -
+01C0   E4                     DB   lsb(num_)   ;   -
 01C1   32                     DB   lsb(dot_)   ;   .
 01C2   6E                     DB   lsb(nop_)   ;   /	
 01C3                             ; REPDAT 10, lsb(num_)		; 10 x repeat lsb of add to the num routine
@@ -649,9 +649,9 @@
 01CE   07                     DB   7   
 01CF   6E                     DB   lsb(nop_)   ;   :
 01D0   6E                     DB   lsb(nop_)   ;   ;
-01D1   BE                     DB   lsb(lt_)   ;   <
-01D2   AD                     DB   lsb(eq_)   ;   =
-01D3   BA                     DB   lsb(gt_)   ;   >
+01D1   6E                     DB   lsb(nop_)   ;   <
+01D2   6E                     DB   lsb(nop_)   ;   =
+01D3   6E                     DB   lsb(nop_)   ;   >
 01D4   6E                     DB   lsb(nop_)   ;   ?   ( -- val )  read a char from input
 01D5   6E                     DB   lsb(nop_)   ;   @
 01D6                             ; REPDAT 26, lsb(call_)		; call a command a, b ....z
@@ -899,7 +899,7 @@
 02B7   CD 98 03               CALL   printStr   ; prog count to stack, put code line 235 on stack then call print
 02BA   53 69 65 6E 61 20 56 30 2E 30 0D 0A 00 .CSTR   "Siena V0.0\r\n"   
 02C7                INTERPRET:      
-02C7   CD 43 08               CALL   prompt   
+02C7   CD 52 08               CALL   prompt   
 02CA   01 00 00               LD   bc,0   ; load bc with offset into TIB, decide char into tib or execute or control
 02CD   ED 43 84 1C            LD   (vTIBPtr),bc   
 02D1                INTERPRET2:      ; calc nesting (a macro might have changed it)
@@ -965,7 +965,7 @@
 0327   23                     INC   hl   ; ????
 0328   03                     INC   bc   
 0329   03                     INC   bc   
-032A   CD 6B 08               CALL   crlf   ; echo character to screen
+032A   CD 7A 08               CALL   crlf   ; echo character to screen
 032D   7B                     LD   a,e   ; if zero nesting append and ETX after \r
 032E   B7                     OR   a   
 032F   20 B3                  JR   nz,waitchar   
@@ -1004,7 +1004,7 @@
 0341   6E                     LD   l,(hl)   ;       get low jump address
 0342   26 04                  LD   h,msb(page4)   ;       Load h with the 1st page address
 0344   E9                     JP   (hl)   ;       Jump to routine
-0345                INIT:        ;=68
+0345                INIT:        
 0345   21 80 1A               LD   hl,LSTACK   
 0348   22 30 1C               LD   (vLoopSP),hl   ; Loop stack pointer stored in memory
 034B   DD 21 80 19            LD   ix,RSTACK   
@@ -1013,11 +1013,11 @@
 0356   11 80 1C               LD   de,altVars   
 0359   01 10 00               LD   bc,8 * 2   
 035C   ED B0                  LDIR      
-035E   21 C0 1C               LD   hl,mintData   ; init namespaces to 0 using ldir
+035E   21 C0 1C               LD   hl,data   ; init namespaces to 0 using ldir
 0361   54 5D                  LD   de,hl   
 0363   13                     INC   de   
 0364   36 00                  LD   (hl),0   
-0366   01 68 00               LD   bc,mintDataSize   
+0366   01 68 00               LD   bc,DATASIZE   
 0369   ED B0                  LDIR      
 036B                INITOPS:      
 036B   21 90 01               LD   hl,iOpcodes   
@@ -1046,13 +1046,13 @@
 038D   18 E5                  JR   initOps1   
 038F                ENTER:       ;=9
 038F   60 69                  LD   hl,bc   
-0391   CD 55 08               CALL   rpush   ; save Instruction Pointer
+0391   CD 64 08               CALL   rpush   ; save Instruction Pointer
 0394   C1                     POP   bc   
 0395   0B                     DEC   bc   
 0396   FD E9                  JP   (iy)   
 0398                PRINTSTR:      ;=14
 0398   E3                     EX   (SP),hl   ; swap			
-0399   CD 50 08               CALL   putStr   
+0399   CD 5F 08               CALL   putStr   
 039C   23                     INC   hl   ; inc past null
 039D   E3                     EX   (SP),hl   ; put it back	
 039E   C9                     RET      
@@ -1071,7 +1071,7 @@
 03AF                LOOKUPREF3:      
 03AF   87                     ADD   a,a   
 03B0   83                     ADD   a,e   
-03B1   21 C0 1C               LD   hl,mintData   
+03B1   21 C0 1C               LD   hl,DATA   
 03B4   85                     ADD   a,l   
 03B5   6F                     LD   l,a   
 03B6   3E 00                  LD   a,0   
@@ -1176,14 +1176,14 @@
 042F   C3 2C 06               JP   go1   
 0432                DOT_:        
 0432   E1                     POP   hl   
-0433   CD DC 07               CALL   prtdec   
+0433   CD EB 07               CALL   prtdec   
 0436                DOT2:        
 0436   3E 20                  LD   a," "   
 0438   CD 85 00               CALL   putchar   
 043B   FD E9                  JP   (iy)   
 043D                HDOT_:       ; print hexadecimal
 043D   E1                     POP   hl   
-043E   CD 24 08               CALL   prthex   
+043E   CD 33 08               CALL   prthex   
 0441   18 F3                  JR   dot2   
 0443                DROP_:       ; Discard the top member of the stack
 0443   E1                     POP   hl   
@@ -1198,7 +1198,7 @@
 044E                EXIT_:       
 044E   03                     INC   bc   ; store offests into a table of bytes, smaller
 044F   50 59                  LD   de,bc   
-0451   CD 60 08               CALL   rpop   ; Restore Instruction pointer
+0451   CD 6F 08               CALL   rpop   ; Restore Instruction pointer
 0454   44 4D                  LD   bc,hl   
 0456   EB                     EX   de,hl   
 0457   E9                     JP   (hl)   
@@ -1211,7 +1211,7 @@
 045C   D5                     PUSH   de   
 045D   FD E9                  JP   (iy)   
 045F                HEXNUM_:      
-045F   C3 BF 07               JP   hexnum   
+045F   C3 CE 07               JP   hexnum   
 0462                KEY_:        
 0462   CD 81 00               CALL   getchar   
 0465   26 00                  LD   h,0   
@@ -1229,7 +1229,7 @@
 0475   D5                     PUSH   de   ; and push it to top of stack
 0476   FD E9                  JP   (iy)   
 0478                RET_:        
-0478   CD 60 08               CALL   rpop   ; Restore Instruction pointer
+0478   CD 6F 08               CALL   rpop   ; Restore Instruction pointer
 047B   44 4D                  LD   bc,hl   
 047D   FD E9                  JP   (iy)   
 047F                ROT_:        ; a b c -- b c a
@@ -1460,7 +1460,7 @@
 0624   E3                     EX   (SP),hl   
 0625   E9                     JP   (hl)   
 0626                PROMPT_:      
-0626   CD 43 08               CALL   prompt   
+0626   CD 52 08               CALL   prompt   
 0629   FD E9                  JP   (iy)   
 062B                GO_:         ;\^
 062B   D1                     POP   de   
@@ -1473,7 +1473,7 @@
 0633   0A                     LD   a,(bc)   ; if ; to tail call optimise
 0634   FE 3B                  CP   ";"   ; by jumping to rather than calling destination
 0636   28 03                  JR   z,go2   
-0638   CD 55 08               CALL   rpush   ; save Instruction Pointer
+0638   CD 64 08               CALL   rpush   ; save Instruction Pointer
 063B                GO2:         
 063B   42 4B                  LD   bc,de   
 063D   0B                     DEC   bc   
@@ -1489,7 +1489,7 @@
 0648   E5                     PUSH   hl   
 0649   FD E9                  JP   (iy)   
 064B                NEWLN_:      
-064B   CD 6B 08               CALL   crlf   
+064B   CD 7A 08               CALL   crlf   
 064E   FD E9                  JP   (iy)   
 0650                OUTPORT_:      
 0650   E1                     POP   hl   
@@ -1502,14 +1502,14 @@
 0659                PRTSTR_:      
 0659                PRTSTR:      
 0659   E1                     POP   hl   
-065A   CD 50 08               CALL   putStr   
+065A   CD 5F 08               CALL   putStr   
 065D   FD E9                  JP   (iy)   
 065F                RPUSH_:      
 065F   E1                     POP   hl   
-0660   CD 55 08               CALL   rpush   
+0660   CD 64 08               CALL   rpush   
 0663   FD E9                  JP   (iy)   
 0665                RPOP_:       
-0665   CD 60 08               CALL   rpop   
+0665   CD 6F 08               CALL   rpop   
 0668   E5                     PUSH   hl   
 0669   FD E9                  JP   (iy)   
 066B                             ; **************************************************************************
@@ -1725,156 +1725,166 @@
 079D                             ; detected. add in the final digit so that hl contains the converted number.
 079D                             ; push hl onto the stack and proceed to the dispatch routine.
 079D                             ; ********************************************************************************
-079D                NUM:         ;=23
-079D   21 00 00               LD   hl,$0000   ;     Clear hl to accept the number
-07A0   0A                     LD   a,(bc)   ;     Get the character which is a numeral
-07A1                NUM1:        ; corrected KB 24/11/21
-07A1   D6 30                  SUB   $30   ;       Form decimal digit
-07A3   85                     ADD   a,l   ;       add into bottom of hl
-07A4   6F                     LD   l,a   ; 
-07A5   3E 00                  LD   a,00   ;       Clear a
-07A7   8C                     ADC   a,h   ; add with carry h-reg
-07A8   67                     LD   h,a   ; Put result in h-reg
-07A9   03                     INC   bc   ;       Increment IP
-07AA   0A                     LD   a,(bc)   ;       and get the next character
-07AB   FE 30                  CP   $30   ;       Less than $30
-07AD   38 0C                  JR   c,num2   ;       Not a number / end of number
-07AF   FE 3A                  CP   $3A   ;       Greater or equal to $3A
-07B1   30 08                  JR   nc,num2   ;       Not a number / end of number
-07B3                             ; Multiply digit(s) in hl by 10
-07B3   29                     ADD   hl,hl   ;        2X
-07B4   5D                     LD   e,l   ;        ld de,hl
-07B5   54                     LD   d,h   ; 
-07B6   29                     ADD   hl,hl   ;        4X
-07B7   29                     ADD   hl,hl   ;        8X
-07B8   19                     ADD   hl,de   ;        2X  + 8X  = 10X
-07B9                             ; 52t cycles
-07B9   18 E6                  JR   num1   
-07BB                NUM2:        
-07BB   0B                     DEC   bc   
-07BC   E5                     PUSH   hl   ; Put the number on the stack
-07BD   FD E9                  JP   (iy)   ; and process the next character
-07BF                HEXNUM:      ; 
-07BF   21 00 00               LD   hl,0   ; Clear hl to accept the number
-07C2                HEXNUM1:      
-07C2   03                     INC   bc   
-07C3   0A                     LD   a,(bc)   ; Get the character which is a numeral
-07C4   CB 77                  BIT   6,a   ; is it uppercase alpha?
-07C6   28 02                  JR   z,hexnum2   ; no a decimal
-07C8   D6 07                  SUB   7   ; sub 7  to make $a - $F
-07CA                HEXNUM2:      
-07CA   D6 30                  SUB   $30   ; Form decimal digit
-07CC   DA BB 07               JP   c,num2   
-07CF   FE 10                  CP   $0F+1   
-07D1   D2 BB 07               JP   nc,num2   
-07D4   29                     ADD   hl,hl   ; 2X ; Multiply digit(s) in hl by 16
-07D5   29                     ADD   hl,hl   ; 4X
-07D6   29                     ADD   hl,hl   ; 8X
-07D7   29                     ADD   hl,hl   ; 16X
-07D8   85                     ADD   a,l   ; add into bottom of hl
-07D9   6F                     LD   l,a   ; 
-07DA   18 E6                  JR   hexnum1   
-07DC                PRTDEC:      ;=34 ; removes leading zeros
-07DC   CB 7C                  BIT   7,h   
-07DE   28 0B                  JR   z,prtdec0   
-07E0   3E 2D                  LD   a,"-"   
-07E2   CD 85 00               CALL   putchar   
-07E5   AF                     XOR   a   
-07E6   95                     SUB   l   
-07E7   6F                     LD   l,a   
-07E8   9F                     SBC   a,a   
-07E9   94                     SUB   h   
-07EA   67                     LD   h,a   
-07EB                PRTDEC0:      ;=34 ; removes leading zeros
-07EB   C5                     PUSH   bc   
-07EC   01 00 00               LD   bc,0   
-07EF   11 F0 D8               LD   de,-10000   
-07F2   CD 0D 08               CALL   prtdec1   
-07F5   11 18 FC               LD   de,-1000   
-07F8   CD 0D 08               CALL   prtdec1   
-07FB   11 9C FF               LD   de,-100   
-07FE   CD 0D 08               CALL   prtdec1   
-0801   1E F6                  LD   e,-10   
-0803   CD 0D 08               CALL   prtdec1   
-0806   1E FF                  LD   e,-1   
-0808   CD 0D 08               CALL   prtdec1   
-080B   C1                     POP   bc   
-080C   C9                     RET      
-080D                PRTDEC1:      ;=24
-080D   06 2F                  LD   b,"0"-1   
-080F                PRTDEC2:      
-080F   04                     INC   b   
-0810   19                     ADD   hl,de   
-0811   38 FC                  JR   c,prtdec2   
-0813   ED 52                  SBC   hl,de   
-0815   3E 30                  LD   a,"0"   
-0817   B8                     CP   b   
-0818   20 05                  JR   nz,prtdec3   
-081A   AF                     XOR   a   
-081B   B1                     OR   c   
-081C   C8                     RET   z   
-081D   18 01                  JR   prtdec4   
-081F                PRTDEC3:      
-081F   0C                     INC   c   
-0820                PRTDEC4:      
-0820   78                     LD   a,b   
-0821   C3 85 00               JP   putchar   
-0824                PRTHEX:      ;=31
-0824                             ; Display hl as a 16-bit number in hex.
-0824   C5                     PUSH   bc   ; preserve the IP
-0825   7C                     LD   a,h   
-0826   CD 2F 08               CALL   prthex2   
-0829   7D                     LD   a,l   
-082A   CD 2F 08               CALL   prthex2   
-082D   C1                     POP   bc   
-082E   C9                     RET      
-082F                PRTHEX2:      
-082F   4F                     LD   c,a   
-0830   1F                     RRA      
-0831   1F                     RRA      
-0832   1F                     RRA      
-0833   1F                     RRA      
-0834   CD 38 08               CALL   prthex3   
-0837   79                     LD   a,c   
-0838                PRTHEX3:      
-0838   E6 0F                  AND   0x0F   
-083A   C6 90                  ADD   a,0x90   
-083C   27                     DAA      
-083D   CE 40                  ADC   a,0x40   
-083F   27                     DAA      
-0840   C3 85 00               JP   putchar   
-0843                             ;*******************************************************************
-0843                             ; Subroutines
-0843                             ;*******************************************************************
-0843                PROMPT:      ;=9
-0843   CD 98 03               CALL   printStr   
-0846   0D 0A 3E 20 00         .CSTR   "\r\n> "   
-084B   C9                     RET      
-084C                PUTSTR0:      
-084C   CD 85 00               CALL   putchar   
-084F   23                     INC   hl   
-0850                PUTSTR:      
-0850   7E                     LD   a,(hl)   
-0851   B7                     OR   a   
-0852   20 F8                  JR   nz,putStr0   
-0854   C9                     RET      
-0855                RPUSH:       ;=11
-0855   DD 2B                  DEC   ix   
-0857   DD 74 00               LD   (ix+0),h   
-085A   DD 2B                  DEC   ix   
-085C   DD 75 00               LD   (ix+0),l   
-085F   C9                     RET      
-0860                RPOP:        ;=11
-0860   DD 6E 00               LD   l,(ix+0)   
-0863   DD 23                  INC   ix   
-0865   DD 66 00               LD   h,(ix+0)   
-0868   DD 23                  INC   ix   
-086A                RPOP2:       
-086A   C9                     RET      
-086B                CRLF:        ;=7
-086B   CD 98 03               CALL   printStr   
-086E   0D 0A 00               .CSTR   "\r\n"   
-0871   C9                     RET      
+079D                NUM:         
+079D   21 00 00               LD   hl,$0000   ; Clear hl to accept the number
+07A0   0A                     LD   a,(bc)   ; Get the character which is a numeral or -
+07A1   FE 2D                  CP   "-"   
+07A3   08                     EX   af,af'   ; save zero flag for later
+07A4   03                     INC   bc   
+07A5   0A                     LD   a,(bc)   
+07A6                NUM1:        ; corrected KB 24/11/21
+07A6   D6 30                  SUB   $30   ;       Form decimal digit
+07A8   85                     ADD   a,l   ;       add into bottom of hl
+07A9   6F                     LD   l,a   ; 
+07AA   3E 00                  LD   a,00   ;       Clear a
+07AC   8C                     ADC   a,h   ; add with carry h-reg
+07AD   67                     LD   h,a   ; Put result in h-reg
+07AE   03                     INC   bc   ;       Increment IP
+07AF   0A                     LD   a,(bc)   ;       and get the next character
+07B0   FE 30                  CP   $30   ;       Less than $30
+07B2   38 0C                  JR   c,num2   ;       Not a number / end of number
+07B4   FE 3A                  CP   $3A   ;       Greater or equal to $3A
+07B6   30 08                  JR   nc,num2   ;       Not a number / end of number
+07B8                             ; Multiply digit(s) in hl by 10
+07B8   29                     ADD   hl,hl   ;        2X
+07B9   5D                     LD   e,l   ;        ld de,hl
+07BA   54                     LD   d,h   ; 
+07BB   29                     ADD   hl,hl   ;        4X
+07BC   29                     ADD   hl,hl   ;        8X
+07BD   19                     ADD   hl,de   ;        2X  + 8X  = 10X
+07BE   18 E6                  JR   num1   
+07C0                NUM2:        
+07C0   0B                     DEC   bc   
+07C1   08                     EX   af,af'   ; restore zero flag
+07C2   20 07                  JR   nz,num3   
+07C4   EB                     EX   de,hl   
+07C5   21 00 00               LD   hl,0   
+07C8   B7                     OR   a   
+07C9   ED 52                  SBC   hl,de   
+07CB                NUM3:        
+07CB   E5                     PUSH   hl   ; Put the number on the stack
+07CC   FD E9                  JP   (iy)   ; and process the next character
+07CE                HEXNUM:      ; 
+07CE   21 00 00               LD   hl,0   ; Clear hl to accept the number
+07D1                HEXNUM1:      
+07D1   03                     INC   bc   
+07D2   0A                     LD   a,(bc)   ; Get the character which is a numeral
+07D3   CB 77                  BIT   6,a   ; is it uppercase alpha?
+07D5   28 02                  JR   z,hexnum2   ; no a decimal
+07D7   D6 07                  SUB   7   ; sub 7  to make $a - $F
+07D9                HEXNUM2:      
+07D9   D6 30                  SUB   $30   ; Form decimal digit
+07DB   DA C0 07               JP   c,num2   
+07DE   FE 10                  CP   $0F+1   
+07E0   D2 C0 07               JP   nc,num2   
+07E3   29                     ADD   hl,hl   ; 2X ; Multiply digit(s) in hl by 16
+07E4   29                     ADD   hl,hl   ; 4X
+07E5   29                     ADD   hl,hl   ; 8X
+07E6   29                     ADD   hl,hl   ; 16X
+07E7   85                     ADD   a,l   ; add into bottom of hl
+07E8   6F                     LD   l,a   ; 
+07E9   18 E6                  JR   hexnum1   
+07EB                PRTDEC:      ;=34 ; removes leading zeros
+07EB   CB 7C                  BIT   7,h   
+07ED   28 0B                  JR   z,prtdec0   
+07EF   3E 2D                  LD   a,"-"   
+07F1   CD 85 00               CALL   putchar   
+07F4   AF                     XOR   a   
+07F5   95                     SUB   l   
+07F6   6F                     LD   l,a   
+07F7   9F                     SBC   a,a   
+07F8   94                     SUB   h   
+07F9   67                     LD   h,a   
+07FA                PRTDEC0:      ;=34 ; removes leading zeros
+07FA   C5                     PUSH   bc   
+07FB   01 00 00               LD   bc,0   
+07FE   11 F0 D8               LD   de,-10000   
+0801   CD 1C 08               CALL   prtdec1   
+0804   11 18 FC               LD   de,-1000   
+0807   CD 1C 08               CALL   prtdec1   
+080A   11 9C FF               LD   de,-100   
+080D   CD 1C 08               CALL   prtdec1   
+0810   1E F6                  LD   e,-10   
+0812   CD 1C 08               CALL   prtdec1   
+0815   1E FF                  LD   e,-1   
+0817   CD 1C 08               CALL   prtdec1   
+081A   C1                     POP   bc   
+081B   C9                     RET      
+081C                PRTDEC1:      ;=24
+081C   06 2F                  LD   b,"0"-1   
+081E                PRTDEC2:      
+081E   04                     INC   b   
+081F   19                     ADD   hl,de   
+0820   38 FC                  JR   c,prtdec2   
+0822   ED 52                  SBC   hl,de   
+0824   3E 30                  LD   a,"0"   
+0826   B8                     CP   b   
+0827   20 05                  JR   nz,prtdec3   
+0829   AF                     XOR   a   
+082A   B1                     OR   c   
+082B   C8                     RET   z   
+082C   18 01                  JR   prtdec4   
+082E                PRTDEC3:      
+082E   0C                     INC   c   
+082F                PRTDEC4:      
+082F   78                     LD   a,b   
+0830   C3 85 00               JP   putchar   
+0833                PRTHEX:      ;=31
+0833                             ; Display hl as a 16-bit number in hex.
+0833   C5                     PUSH   bc   ; preserve the IP
+0834   7C                     LD   a,h   
+0835   CD 3E 08               CALL   prthex2   
+0838   7D                     LD   a,l   
+0839   CD 3E 08               CALL   prthex2   
+083C   C1                     POP   bc   
+083D   C9                     RET      
+083E                PRTHEX2:      
+083E   4F                     LD   c,a   
+083F   1F                     RRA      
+0840   1F                     RRA      
+0841   1F                     RRA      
+0842   1F                     RRA      
+0843   CD 47 08               CALL   prthex3   
+0846   79                     LD   a,c   
+0847                PRTHEX3:      
+0847   E6 0F                  AND   0x0F   
+0849   C6 90                  ADD   a,0x90   
+084B   27                     DAA      
+084C   CE 40                  ADC   a,0x40   
+084E   27                     DAA      
+084F   C3 85 00               JP   putchar   
+0852                             ;*******************************************************************
+0852                             ; Subroutines
+0852                             ;*******************************************************************
+0852                PROMPT:      ;=9
+0852   CD 98 03               CALL   printStr   
+0855   0D 0A 3E 20 00         .CSTR   "\r\n> "   
+085A   C9                     RET      
+085B                PUTSTR0:      
+085B   CD 85 00               CALL   putchar   
+085E   23                     INC   hl   
+085F                PUTSTR:      
+085F   7E                     LD   a,(hl)   
+0860   B7                     OR   a   
+0861   20 F8                  JR   nz,putStr0   
+0863   C9                     RET      
+0864                RPUSH:       ;=11
+0864   DD 2B                  DEC   ix   
+0866   DD 74 00               LD   (ix+0),h   
+0869   DD 2B                  DEC   ix   
+086B   DD 75 00               LD   (ix+0),l   
+086E   C9                     RET      
+086F                RPOP:        ;=11
+086F   DD 6E 00               LD   l,(ix+0)   
+0872   DD 23                  INC   ix   
+0874   DD 66 00               LD   h,(ix+0)   
+0877   DD 23                  INC   ix   
+0879                RPOP2:       
+0879   C9                     RET      
+087A                CRLF:        ;=7
+087A   CD 98 03               CALL   printStr   
+087D   0D 0A 00               .CSTR   "\r\n"   
+0880   C9                     RET      
 1800                          .ORG   RAMSTART   
 1800                TIB:      DS   TIBSIZE   
 1900                          DS   RSIZE   
@@ -1910,12 +1920,12 @@
 1C4C                          DS   26*2   
 1C80                ALTVARS:      
 1C80                VS0:      DS   2   ; a
-1C82                VBASE16:   DS   2   ; b
+1C82                          DS   2   ; b
 1C84                VTIBPTR:   DS   2   ; c
-1C86                VNS:      DS   2   ; d
+1C86                          DS   2   ; d
 1C88                VLASTDEF:   DS   2   ; e
 1C8A                          DS   2   ; f
-1C8C                VALTPAGE:   DS   2   ; g
+1C8C                          DS   2   ; g
 1C8E                VHEAPPTR:   DS   2   ; h
 1C90                          DS   2   ; i
 1C92                          DS   2   ; j
@@ -1939,7 +1949,7 @@
 1CB4                             ; NS Table - Each space holds 26 user commands, 26 user vars, 12 bytes free
 1CB4                             ; ****************************************************************
 1CB4                          ALIGN   $40   
-1CC0                MINTDATA:   DS   mintDataSize   
+1CC0                DATA:     DS   dataSize   
 1D28                HEAP:        
 
 
@@ -2037,10 +2047,10 @@ PUTCHAR:            0085 DEFINED AT LINE 438 IN IOSerial.asm
                     > USED AT LINE 451 IN SCAN.asm
                     > USED AT LINE 700 IN SCAN.asm
                     > USED AT LINE 1016 IN SCAN.asm
-                    > USED AT LINE 1386 IN SCAN.asm
-                    > USED AT LINE 1426 IN SCAN.asm
-                    > USED AT LINE 1451 IN SCAN.asm
-                    > USED AT LINE 1464 IN SCAN.asm
+                    > USED AT LINE 1392 IN SCAN.asm
+                    > USED AT LINE 1432 IN SCAN.asm
+                    > USED AT LINE 1457 IN SCAN.asm
+                    > USED AT LINE 1470 IN SCAN.asm
 RESET:              008B DEFINED AT LINE 444 IN IOSerial.asm
                     > USED AT LINE 103 IN IOSerial.asm
 DSIZE:              0080 DEFINED AT LINE 15 IN SCAN.asm
@@ -2056,7 +2066,7 @@ TRUE:               0001 DEFINED AT LINE 19 IN SCAN.asm
 FALSE:              0000 DEFINED AT LINE 20 IN SCAN.asm
                     > USED AT LINE 55 IN SCAN.asm
 EMPTY:              0000 DEFINED AT LINE 21 IN SCAN.asm
-MINTDATASIZE:       0068 DEFINED AT LINE 23 IN SCAN.asm
+DATASIZE:           0068 DEFINED AT LINE 23 IN SCAN.asm
                     > USED AT LINE 521 IN SCAN.asm
                     > USED AT LINE 73 IN ram.asm
 MACROS:             0180 DEFINED AT LINE 48 IN SCAN.asm
@@ -2107,8 +2117,8 @@ ENTER:              038F DEFINED AT LINE 552 IN SCAN.asm
                     > USED AT LINE 440 IN SCAN.asm
 PRINTSTR:           0398 DEFINED AT LINE 559 IN SCAN.asm
                     > USED AT LINE 387 IN SCAN.asm
-                    > USED AT LINE 1459 IN SCAN.asm
-                    > USED AT LINE 1488 IN SCAN.asm
+                    > USED AT LINE 1465 IN SCAN.asm
+                    > USED AT LINE 1494 IN SCAN.asm
 LOOKUPREF:          039F DEFINED AT LINE 566 IN SCAN.asm
 LOOKUPREF0:         03A1 DEFINED AT LINE 568 IN SCAN.asm
 LOOKUPREF1:         03A5 DEFINED AT LINE 571 IN SCAN.asm
@@ -2376,33 +2386,35 @@ A:                  066B DEFINED AT LINE 1094 IN SCAN.asm
                     > USED AT LINE 1299 IN SCAN.asm
                     > USED AT LINE 1308 IN SCAN.asm
                     > USED AT LINE 1328 IN SCAN.asm
-                    > USED AT LINE 1333 IN SCAN.asm
-                    > USED AT LINE 1334 IN SCAN.asm
+                    > USED AT LINE 1332 IN SCAN.asm
                     > USED AT LINE 1335 IN SCAN.asm
                     > USED AT LINE 1336 IN SCAN.asm
                     > USED AT LINE 1337 IN SCAN.asm
-                    > USED AT LINE 1340 IN SCAN.asm
-                    > USED AT LINE 1365 IN SCAN.asm
-                    > USED AT LINE 1366 IN SCAN.asm
-                    > USED AT LINE 1378 IN SCAN.asm
-                    > USED AT LINE 1379 IN SCAN.asm
+                    > USED AT LINE 1338 IN SCAN.asm
+                    > USED AT LINE 1339 IN SCAN.asm
+                    > USED AT LINE 1342 IN SCAN.asm
+                    > USED AT LINE 1361 IN SCAN.asm
+                    > USED AT LINE 1371 IN SCAN.asm
+                    > USED AT LINE 1372 IN SCAN.asm
+                    > USED AT LINE 1384 IN SCAN.asm
                     > USED AT LINE 1385 IN SCAN.asm
-                    > USED AT LINE 1387 IN SCAN.asm
-                    > USED AT LINE 1389 IN SCAN.asm
-                    > USED AT LINE 1390 IN SCAN.asm
-                    > USED AT LINE 1390 IN SCAN.asm
-                    > USED AT LINE 1392 IN SCAN.asm
-                    > USED AT LINE 1415 IN SCAN.asm
-                    > USED AT LINE 1418 IN SCAN.asm
-                    > USED AT LINE 1425 IN SCAN.asm
+                    > USED AT LINE 1391 IN SCAN.asm
+                    > USED AT LINE 1393 IN SCAN.asm
+                    > USED AT LINE 1395 IN SCAN.asm
+                    > USED AT LINE 1396 IN SCAN.asm
+                    > USED AT LINE 1396 IN SCAN.asm
+                    > USED AT LINE 1398 IN SCAN.asm
+                    > USED AT LINE 1421 IN SCAN.asm
+                    > USED AT LINE 1424 IN SCAN.asm
                     > USED AT LINE 1431 IN SCAN.asm
-                    > USED AT LINE 1433 IN SCAN.asm
-                    > USED AT LINE 1438 IN SCAN.asm
+                    > USED AT LINE 1437 IN SCAN.asm
+                    > USED AT LINE 1439 IN SCAN.asm
                     > USED AT LINE 1444 IN SCAN.asm
-                    > USED AT LINE 1447 IN SCAN.asm
-                    > USED AT LINE 1449 IN SCAN.asm
-                    > USED AT LINE 1467 IN SCAN.asm
-                    > USED AT LINE 1468 IN SCAN.asm
+                    > USED AT LINE 1450 IN SCAN.asm
+                    > USED AT LINE 1453 IN SCAN.asm
+                    > USED AT LINE 1455 IN SCAN.asm
+                    > USED AT LINE 1473 IN SCAN.asm
+                    > USED AT LINE 1474 IN SCAN.asm
 C:                  067B DEFINED AT LINE 1104 IN SCAN.asm
                     > USED AT LINE 410 IN SCAN.asm
                     > USED AT LINE 534 IN SCAN.asm
@@ -2422,13 +2434,13 @@ C:                  067B DEFINED AT LINE 1104 IN SCAN.asm
                     > USED AT LINE 1069 IN SCAN.asm
                     > USED AT LINE 1070 IN SCAN.asm
                     > USED AT LINE 1296 IN SCAN.asm
-                    > USED AT LINE 1342 IN SCAN.asm
-                    > USED AT LINE 1371 IN SCAN.asm
-                    > USED AT LINE 1413 IN SCAN.asm
+                    > USED AT LINE 1344 IN SCAN.asm
+                    > USED AT LINE 1377 IN SCAN.asm
                     > USED AT LINE 1419 IN SCAN.asm
-                    > USED AT LINE 1423 IN SCAN.asm
-                    > USED AT LINE 1438 IN SCAN.asm
+                    > USED AT LINE 1425 IN SCAN.asm
+                    > USED AT LINE 1429 IN SCAN.asm
                     > USED AT LINE 1444 IN SCAN.asm
+                    > USED AT LINE 1450 IN SCAN.asm
 D:                  068B DEFINED AT LINE 1114 IN SCAN.asm
                     > USED AT LINE 438 IN SCAN.asm
                     > USED AT LINE 567 IN SCAN.asm
@@ -2443,7 +2455,7 @@ D:                  068B DEFINED AT LINE 1114 IN SCAN.asm
                     > USED AT LINE 994 IN SCAN.asm
                     > USED AT LINE 1035 IN SCAN.asm
                     > USED AT LINE 1303 IN SCAN.asm
-                    > USED AT LINE 1348 IN SCAN.asm
+                    > USED AT LINE 1350 IN SCAN.asm
 E:                  06A5 DEFINED AT LINE 1128 IN SCAN.asm
                     > USED AT LINE 397 IN SCAN.asm
                     > USED AT LINE 434 IN SCAN.asm
@@ -2473,9 +2485,9 @@ E:                  06A5 DEFINED AT LINE 1128 IN SCAN.asm
                     > USED AT LINE 1066 IN SCAN.asm
                     > USED AT LINE 1070 IN SCAN.asm
                     > USED AT LINE 1302 IN SCAN.asm
-                    > USED AT LINE 1347 IN SCAN.asm
-                    > USED AT LINE 1402 IN SCAN.asm
-                    > USED AT LINE 1404 IN SCAN.asm
+                    > USED AT LINE 1349 IN SCAN.asm
+                    > USED AT LINE 1408 IN SCAN.asm
+                    > USED AT LINE 1410 IN SCAN.asm
 F:                  06B0 DEFINED AT LINE 1136 IN SCAN.asm
                     > USED AT LINE 880 IN SCAN.asm
 G:                  06BB DEFINED AT LINE 1144 IN SCAN.asm
@@ -2507,16 +2519,16 @@ L:                  06EE DEFINED AT LINE 1175 IN SCAN.asm
                     > USED AT LINE 1067 IN SCAN.asm
                     > USED AT LINE 1069 IN SCAN.asm
                     > USED AT LINE 1296 IN SCAN.asm
-                    > USED AT LINE 1333 IN SCAN.asm
-                    > USED AT LINE 1334 IN SCAN.asm
-                    > USED AT LINE 1347 IN SCAN.asm
-                    > USED AT LINE 1378 IN SCAN.asm
-                    > USED AT LINE 1379 IN SCAN.asm
-                    > USED AT LINE 1388 IN SCAN.asm
-                    > USED AT LINE 1389 IN SCAN.asm
-                    > USED AT LINE 1433 IN SCAN.asm
-                    > USED AT LINE 1476 IN SCAN.asm
-                    > USED AT LINE 1480 IN SCAN.asm
+                    > USED AT LINE 1335 IN SCAN.asm
+                    > USED AT LINE 1336 IN SCAN.asm
+                    > USED AT LINE 1349 IN SCAN.asm
+                    > USED AT LINE 1384 IN SCAN.asm
+                    > USED AT LINE 1385 IN SCAN.asm
+                    > USED AT LINE 1394 IN SCAN.asm
+                    > USED AT LINE 1395 IN SCAN.asm
+                    > USED AT LINE 1439 IN SCAN.asm
+                    > USED AT LINE 1482 IN SCAN.asm
+                    > USED AT LINE 1486 IN SCAN.asm
 M:                  06FE DEFINED AT LINE 1185 IN SCAN.asm
                     > USED AT LINE 841 IN SCAN.asm
                     > USED AT LINE 857 IN SCAN.asm
@@ -2572,60 +2584,62 @@ MUL2:               078B DEFINED AT LINE 1300 IN SCAN.asm
                     > USED AT LINE 1309 IN SCAN.asm
 NUM:                079D DEFINED AT LINE 1326 IN SCAN.asm
                     > USED AT LINE 867 IN SCAN.asm
-NUM1:               07A1 DEFINED AT LINE 1330 IN SCAN.asm
+NUM1:               07A6 DEFINED AT LINE 1333 IN SCAN.asm
                     > USED AT LINE 1354 IN SCAN.asm
-NUM2:               07BB DEFINED AT LINE 1356 IN SCAN.asm
-                    > USED AT LINE 1342 IN SCAN.asm
+NUM2:               07C0 DEFINED AT LINE 1355 IN SCAN.asm
                     > USED AT LINE 1344 IN SCAN.asm
-                    > USED AT LINE 1371 IN SCAN.asm
-                    > USED AT LINE 1373 IN SCAN.asm
-HEXNUM:             07BF DEFINED AT LINE 1361 IN SCAN.asm
+                    > USED AT LINE 1346 IN SCAN.asm
+                    > USED AT LINE 1377 IN SCAN.asm
+                    > USED AT LINE 1379 IN SCAN.asm
+NUM3:               07CB DEFINED AT LINE 1363 IN SCAN.asm
+                    > USED AT LINE 1358 IN SCAN.asm
+HEXNUM:             07CE DEFINED AT LINE 1367 IN SCAN.asm
                     > USED AT LINE 738 IN SCAN.asm
-HEXNUM1:            07C2 DEFINED AT LINE 1363 IN SCAN.asm
-                    > USED AT LINE 1380 IN SCAN.asm
-HEXNUM2:            07CA DEFINED AT LINE 1369 IN SCAN.asm
-                    > USED AT LINE 1367 IN SCAN.asm
-PRTDEC:             07DC DEFINED AT LINE 1382 IN SCAN.asm
+HEXNUM1:            07D1 DEFINED AT LINE 1369 IN SCAN.asm
+                    > USED AT LINE 1386 IN SCAN.asm
+HEXNUM2:            07D9 DEFINED AT LINE 1375 IN SCAN.asm
+                    > USED AT LINE 1373 IN SCAN.asm
+PRTDEC:             07EB DEFINED AT LINE 1388 IN SCAN.asm
                     > USED AT LINE 697 IN SCAN.asm
-PRTDEC0:            07EB DEFINED AT LINE 1393 IN SCAN.asm
-                    > USED AT LINE 1384 IN SCAN.asm
-PRTDEC1:            080D DEFINED AT LINE 1408 IN SCAN.asm
-                    > USED AT LINE 1397 IN SCAN.asm
-                    > USED AT LINE 1399 IN SCAN.asm
-                    > USED AT LINE 1401 IN SCAN.asm
+PRTDEC0:            07FA DEFINED AT LINE 1399 IN SCAN.asm
+                    > USED AT LINE 1390 IN SCAN.asm
+PRTDEC1:            081C DEFINED AT LINE 1414 IN SCAN.asm
                     > USED AT LINE 1403 IN SCAN.asm
                     > USED AT LINE 1405 IN SCAN.asm
-PRTDEC2:            080F DEFINED AT LINE 1410 IN SCAN.asm
-                    > USED AT LINE 1413 IN SCAN.asm
-PRTDEC3:            081F DEFINED AT LINE 1422 IN SCAN.asm
-                    > USED AT LINE 1417 IN SCAN.asm
-PRTDEC4:            0820 DEFINED AT LINE 1424 IN SCAN.asm
-                    > USED AT LINE 1421 IN SCAN.asm
-PRTHEX:             0824 DEFINED AT LINE 1428 IN SCAN.asm
+                    > USED AT LINE 1407 IN SCAN.asm
+                    > USED AT LINE 1409 IN SCAN.asm
+                    > USED AT LINE 1411 IN SCAN.asm
+PRTDEC2:            081E DEFINED AT LINE 1416 IN SCAN.asm
+                    > USED AT LINE 1419 IN SCAN.asm
+PRTDEC3:            082E DEFINED AT LINE 1428 IN SCAN.asm
+                    > USED AT LINE 1423 IN SCAN.asm
+PRTDEC4:            082F DEFINED AT LINE 1430 IN SCAN.asm
+                    > USED AT LINE 1427 IN SCAN.asm
+PRTHEX:             0833 DEFINED AT LINE 1434 IN SCAN.asm
                     > USED AT LINE 705 IN SCAN.asm
-PRTHEX2:            082F DEFINED AT LINE 1437 IN SCAN.asm
-                    > USED AT LINE 1432 IN SCAN.asm
-                    > USED AT LINE 1434 IN SCAN.asm
-PRTHEX3:            0838 DEFINED AT LINE 1445 IN SCAN.asm
-                    > USED AT LINE 1443 IN SCAN.asm
-PROMPT:             0843 DEFINED AT LINE 1458 IN SCAN.asm
+PRTHEX2:            083E DEFINED AT LINE 1443 IN SCAN.asm
+                    > USED AT LINE 1438 IN SCAN.asm
+                    > USED AT LINE 1440 IN SCAN.asm
+PRTHEX3:            0847 DEFINED AT LINE 1451 IN SCAN.asm
+                    > USED AT LINE 1449 IN SCAN.asm
+PROMPT:             0852 DEFINED AT LINE 1464 IN SCAN.asm
                     > USED AT LINE 391 IN SCAN.asm
                     > USED AT LINE 1028 IN SCAN.asm
-PUTSTR0:            084C DEFINED AT LINE 1463 IN SCAN.asm
-                    > USED AT LINE 1469 IN SCAN.asm
-PUTSTR:             0850 DEFINED AT LINE 1466 IN SCAN.asm
+PUTSTR0:            085B DEFINED AT LINE 1469 IN SCAN.asm
+                    > USED AT LINE 1475 IN SCAN.asm
+PUTSTR:             085F DEFINED AT LINE 1472 IN SCAN.asm
                     > USED AT LINE 561 IN SCAN.asm
                     > USED AT LINE 1076 IN SCAN.asm
-RPUSH:              0855 DEFINED AT LINE 1472 IN SCAN.asm
+RPUSH:              0864 DEFINED AT LINE 1478 IN SCAN.asm
                     > USED AT LINE 554 IN SCAN.asm
                     > USED AT LINE 1043 IN SCAN.asm
                     > USED AT LINE 1082 IN SCAN.asm
-RPOP:               0860 DEFINED AT LINE 1479 IN SCAN.asm
+RPOP:               086F DEFINED AT LINE 1485 IN SCAN.asm
                     > USED AT LINE 723 IN SCAN.asm
                     > USED AT LINE 762 IN SCAN.asm
                     > USED AT LINE 1086 IN SCAN.asm
-RPOP2:              086A DEFINED AT LINE 1484 IN SCAN.asm
-CRLF:               086B DEFINED AT LINE 1487 IN SCAN.asm
+RPOP2:              0879 DEFINED AT LINE 1490 IN SCAN.asm
+CRLF:               087A DEFINED AT LINE 1493 IN SCAN.asm
                     > USED AT LINE 464 IN SCAN.asm
                     > USED AT LINE 1061 IN SCAN.asm
 TIB:                1800 DEFINED AT LINE 3 IN ram.asm
@@ -2688,19 +2702,16 @@ PUTCVEC:            1C4A DEFINED AT LINE 37 IN ram.asm
 ALTVARS:            1C80 DEFINED AT LINE 40 IN ram.asm
                     > USED AT LINE 513 IN SCAN.asm
 VS0:                1C80 DEFINED AT LINE 42 IN ram.asm
-VBASE16:            1C82 DEFINED AT LINE 43 IN ram.asm
 VTIBPTR:            1C84 DEFINED AT LINE 44 IN ram.asm
                     > USED AT LINE 394 IN SCAN.asm
                     > USED AT LINE 430 IN SCAN.asm
                     > USED AT LINE 443 IN SCAN.asm
                     > USED AT LINE 472 IN SCAN.asm
-VNS:                1C86 DEFINED AT LINE 45 IN ram.asm
 VLASTDEF:           1C88 DEFINED AT LINE 46 IN ram.asm
-VALTPAGE:           1C8C DEFINED AT LINE 48 IN ram.asm
 VHEAPPTR:           1C8E DEFINED AT LINE 49 IN ram.asm
                     > USED AT LINE 921 IN SCAN.asm
                     > USED AT LINE 932 IN SCAN.asm
-MINTDATA:           1CC0 DEFINED AT LINE 73 IN ram.asm
+DATA:               1CC0 DEFINED AT LINE 73 IN ram.asm
                     > USED AT LINE 517 IN SCAN.asm
                     > USED AT LINE 581 IN SCAN.asm
 HEAP:               1D28 DEFINED AT LINE 75 IN ram.asm

@@ -40,12 +40,12 @@ PUTCVEC:    DS 2                ;
 altVars:
 
 vS0:        DS 2                ; a
-vBase16:    DS 2                ; b
+            DS 2                ; b
 vTIBPtr:    DS 2                ; c
-vNS:        DS 2                ; d
+            DS 2                ; d
 vLastDef:   DS 2                ; e
             DS 2                ; f
-vAltPage:   DS 2                ; g
+            DS 2                ; g
 vHeapPtr:   DS 2                ; h
             DS 2                ; i
             DS 2                ; j
@@ -70,6 +70,6 @@ vHeapPtr:   DS 2                ; h
 ; NS Table - Each space holds 26 user commands, 26 user vars, 12 bytes free
 ; ****************************************************************
             .align $40
-mintData:   DS mintDataSize
+DATA:   DS dataSize
 
 HEAP:         
