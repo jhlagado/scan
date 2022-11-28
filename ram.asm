@@ -8,8 +8,6 @@ rStack:
             DS DSIZE
 dStack:        
 stack:
-            DS LSIZE
-lStack:
             .align $100
 opcodes:    
             DS $80

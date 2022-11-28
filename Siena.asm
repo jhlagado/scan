@@ -1,6 +1,6 @@
 ; *************************************************************************
 ;
-;       Siena Programming Language for the Z80 
+;       Siena programming language for the Z80 
 ;
 ;       by John Hardy 2022
 ;
@@ -14,7 +14,6 @@
 
         DSIZE       EQU $80
         RSIZE       EQU $80
-        LSIZE       EQU $80
         TIBSIZE     EQU $100	; 256 bytes , along line!
         TRUE        EQU 1		; not FF, for Siena
         FALSE       EQU 0
@@ -52,12 +51,12 @@ macros:
 ; ***********************************************************************		
 iAltVars:			            ; value copied into tables
         DW dStack               ; a vS0 start of datastack			
-        DW FALSE                ; b vBase16 
+        DW 0                    ; b  
         DW 0                    ; c vTIBPtr an offset to the tib
         DW 0                    ; d 
-        DW 65                   ; e vLastDef "a" last command u defined
+        DW 0                    ; e 
         DW 0                    ; f 
-        DW page6                ; g 256 bytes limits
+        DW 0                    ; g 
         DW HEAP                 ; h vHeapPtr \h start of the free mem
 
 
@@ -249,7 +248,7 @@ iOpcodes:
         DB lsb(EMPTY)       ; ^_            
 
         LITDAT 5
-        DB lsb(aNop_)       ;a0    SP  				;space
+        DB lsb(aNop_)       ;a0    sp  				;space
         DB lsb(aNop_)       ;a1    \!       			; this is a bug shud be lsb(cstore_)     
         DB lsb(aNop_)       ;a2    \"  				
         DB lsb(aNop_)       ;a3    \#  utility command		; table of special routines ie #5 etc				
@@ -375,14 +374,14 @@ iOpcodes:
 
 etx:                                ;=12
         ld hl,-DSTACK
-        add hl,SP
+        add hl,sp
         jr nc,etx1
-        ld SP,DSTACK
+        ld sp,DSTACK
 etx1:
         jr interpret
 
 start:
-        ld SP,DSTACK		    ; start of Siena
+        ld sp,DSTACK		    ; start of Siena
         call init		        ; setups
         call printStr		    ; prog count to stack, put code line 235 on stack then call print
         .cstr "Siena V0.0\r\n"
@@ -505,10 +504,8 @@ next:                               ;=9
         jp (hl)                     ;       Jump to routine
 
 init:                               
-        ld hl,LSTACK
-        ld (vLoopSP),hl             ; Loop stack pointer stored in memory
+        ld iy,DSTACK
         ld ix,RSTACK
-        ld iy,next		            ; iy provides a faster jump to next
         ld hl,ialtVars
         ld de,altVars
         ld bc,8 * 2
@@ -554,13 +551,13 @@ enter:                              ;=9
         call rpush                  ; save Instruction Pointer
         pop bc
         dec bc
-        jp (iy)                    
+        jp next                    
 
 printStr:                       ;=14
-        ex (SP),hl		; swap			
+        ex (sp),hl		; swap			
         call putStr		
         inc hl			; inc past null
-        ex (SP),hl		; put it back	
+        ex (sp),hl		; put it back	
         ret
 
 lookupRef:
@@ -648,7 +645,7 @@ and_:
 and1:
         ld      h,a         ;   
         push    hl          ;    
-        jp (iy)        ;   
+        jp next        ;   
         
                             ; 
 or_: 		 
@@ -681,7 +678,7 @@ add_:                           ; add the top 2 members of the stack
         pop     hl                 
         add     hl,de              
         push    hl                 
-        jp (iy)              
+        jp next              
                                  
 call_:
         ld a,(bc)
@@ -698,7 +695,7 @@ dot_:
 dot2:
         ld a,' '           
         call putchar
-        jp (iy)
+        jp next
 
 hdot_:                          ; print hexadecimal
         pop     hl
@@ -707,13 +704,13 @@ hdot_:                          ; print hexadecimal
 
 drop_:                          ; Discard the top member of the stack
         pop     hl
-        jp (iy)
+        jp next
 
 dup_:        
         pop     hl              ; Duplicate the top member of the stack
         push    hl
         push    hl
-        jp (iy)
+        jp next
 etx_:
         jp ETX
         
@@ -732,7 +729,7 @@ fetch1:
         inc hl             
         ld d,(hl)         
         push de              
-        jp (iy)           
+        jp next           
 
 hexnum_:   
         jp hexnum
@@ -742,7 +739,7 @@ key_:
         ld h,0
         ld l,a
         push hl
-        jp (iy)
+        jp next
 
 mul_:   jp mul      
 
@@ -756,27 +753,27 @@ over_:
         push de
         push hl
         push de              ; and push it to top of stack
-        jp (iy)        
+        jp next        
     
 ret_:
         call rpop               ; Restore Instruction pointer
         ld bc,hl                
-        jp (iy)             
+        jp next             
 
 rot_:                               ; a b c -- b c a
         pop de                      ; a b                   de = c
         pop hl                      ; a                     hl = b
-        ex (SP),hl                  ; b                     hl = a
+        ex (sp),hl                  ; b                     hl = a
         push de                     ; b c             
         push hl                     ; b c a                         
-        jp (iy)
+        jp next
 
 ;  Left shift { is multiply by 2		
 shl_:   
         pop hl                  ; Duplicate the top member of the stack
         add hl,hl
         push hl                 ; shift left fallthrough into add_     
-        jp (iy)                 ;   
+        jp next                 ;   
     
 				;  Right shift } is a divide by 2		
 shr_:    
@@ -785,7 +782,7 @@ shr1:
         srl h
         RR l
         push hl
-        jp (iy)                 ;   
+        jp next                 ;   
 
 store_:                         ; Store the value at the address placed on the top of the stack
         pop hl               
@@ -793,13 +790,13 @@ store_:                         ; Store the value at the address placed on the t
         ld (hl),e          
         inc hl              
         ld (hl),d          
-        jp (iy)            
+        jp next            
                                   
 swap_:                      ; a b -- b a Swap the top 2 elements of the stack
         pop hl
-        ex (SP),hl
+        ex (sp),hl
         push hl
-        jp (iy)
+        jp next
         
 neg_:   
         ld hl, 0    		; NEGate the value on top of stack (2's complement)
@@ -813,7 +810,7 @@ sub2:
         or a                ;      Entry point for NEGate
         sbc hl,de           ; 15t
         push hl             ;    
-        jp (iy)             ;   
+        jp next             ;   
                                 ; 5  
 eq_:    
         pop hl
@@ -824,7 +821,7 @@ eq_:
 false_:
         ld hl, 0
         push hl
-        jp (iy) 
+        jp next 
 
 gt_:    
         pop de
@@ -842,7 +839,7 @@ lt1:
 true_:
         ld hl, 1
         push hl
-        jp (iy) 
+        jp next 
 
 gte_:    
         pop de
@@ -862,7 +859,7 @@ var_:
         ld a,(bc)
         call lookupRef2
         push hl
-        jp (iy)
+        jp next
         
 num_:   jp  num
 lambda_:   
@@ -914,7 +911,7 @@ div_:   jr div
         ;falls through 
 
         push hl
-        jp (iy)
+        jp next
 
 lambda:                             ;=         
         inc bc
@@ -930,7 +927,7 @@ lambda1:                                    ; Skip to end of definition
 lambda2:    
         dec bc
         ld (vHeapPtr),de            ; bump heap ptr to after definiton
-        jp (iy)       
+        jp next       
 
 ; ********************************************************************
 ; 16-bit division subroutine.
@@ -976,7 +973,7 @@ div4:
         push de                     ; push Result
         push hl                     ; push remainder             
 
-        jp (iy)
+        jp next
 
         	                    ;=57                     
 
@@ -987,14 +984,14 @@ div4:
 page6:
 
 anop_:
-        jp (iy)                    
+        jp next                    
 
 cFetch_:
         pop     hl          
         ld      d,0            
         ld      e,(hl)         
         push    de              
-        jp (iy)           
+        jp next           
   
 comment_:
         inc bc                      ; point to next char
@@ -1002,31 +999,31 @@ comment_:
         cp "\r"                     ; terminate at cr 
         jr nz,comment_
         dec bc
-        jp   (iy) 
+        jp  next 
 
 cStore_:	  
         pop    hl               
         pop    de               
         ld     (hl),e          
-        jp     (iy)            
+        jp next            
                              
 emit_:
         pop hl
         ld a,l
         call putchar
-        jp (iy)
+        jp next
 
 exec_:
         call exec1
-        jp (iy)
+        jp next
 exec1:
         pop hl
-        ex (SP),hl
+        ex (sp),hl
         jp (hl)
 
 prompt_:
         call prompt
-        jp (iy)
+        jp next
 
 
 go_:				                ;\^
@@ -1045,7 +1042,7 @@ go2:
         ld bc,de
         dec bc
 go3:
-        jp (iy)                     
+        jp next                     
 
 inPort_:			    ; \<
         pop hl
@@ -1055,11 +1052,11 @@ inPort_:			    ; \<
         ld h,0
         ld c,a
         push hl
-        jp (iy)        
+        jp next        
 
 newln_:
         call crlf
-        jp (iy)        
+        jp next        
 
 outPort_:
         pop hl
@@ -1068,24 +1065,24 @@ outPort_:
         pop hl
         out (c),l
         ld c,e
-        jp (iy)        
+        jp next        
 
 prtstr_:
 prtstr:
         pop hl
         call putStr
-        jp (iy)
+        jp next
 
 
 rpush_:
         pop hl
         call rpush
-        jp (iy)
+        jp next
 
 rpop_:
         call rpop
         push hl
-        jp (iy)
+        jp next
 
 ; **************************************************************************
 ; Page 6 primitive routines continued  (page 7) 
@@ -1280,7 +1277,7 @@ shift_:
 undrop_:
 while_:
 
-        jp (iy)
+        jp next
 
 ;*******************************************************************
 ; Page 5 primitive routines continued
@@ -1309,7 +1306,7 @@ mul2:
         jr nz,mul2
 		pop bc			            ; Restore the IP
 		push hl                     ; Put the product on the stack - stack bug fixed 2/12/21
-		jp (iy)
+		jp next
 
 
 num:
@@ -1346,7 +1343,7 @@ num2:
         sbc hl,de              
 xnum3:
         push hl                     ; Put the number on the stack
-        jp (iy)                     ; and process the next character
+        jp next                     ; and process the next character
 
 
 
