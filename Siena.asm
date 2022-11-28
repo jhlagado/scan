@@ -1311,80 +1311,19 @@ mul2:
 		push hl                     ; Put the product on the stack - stack bug fixed 2/12/21
 		jp (iy)
 
-; ********************************************************************************
-; Number Handling Routine - converts numeric ascii string to a 16-bit number in hl
-; Read the first character. 
-;			
-; Number characters ($30 to $39) are converted to digits by subtracting $30
-; and then added into the l register. (hl forms a 16-bit accumulator)
-; Fetch the next character, if it is a number, multiply contents of hl by 10
-; and then add in the next digit. Repeat this until a non-number character is 
-; detected. add in the final digit so that hl contains the converted number.
-; push hl onto the stack and proceed to the dispatch routine.
-; ********************************************************************************
-         
-xxnum:                                
-		ld hl,$0000				    ; Clear hl to accept the number
-		ld a,(bc)				    ; Get numeral or -
-        cp '-'
-        jr nz,num0
-        ex af,af'                   ; save zero flag = 1 for later
-        inc bc
-        ld a,(bc)
-        jr num1
-num0:
-        ld d,a                      ; save a copy in d
-        ex af,af'                   ; save zero flag = 0 for later
-		ld a,d				        ; restore char
-num1:                               ; corrected KB 24/11/21
-        sub $30                     ;       Form decimal digit
-        add a,l                     ;       add into bottom of hl
-        ld  l,a                     ;   
-        ld a,00                     ;       Clear a
-        adc	a,h	                    ; add with carry h-reg
-	    ld	h,a	                    ; Put result in h-reg
-      
-        inc bc                      ;       Increment IP
-        ld a, (bc)                  ;       and get the next character
-        cp $30                      ;       Less than $30
-        jr c, num2                  ;       Not a number / end of number
-        cp $3A                      ;       Greater or equal to $3A
-        jr nc, num2                 ;       Not a number / end of number
-                                    ; Multiply digit(s) in hl by 10
-        add hl,hl                   ;        2X
-        ld  e,l                     ;        ld de,hl
-        ld  d,h                     ;    
-        add hl,hl                   ;        4X
-        add hl,hl                   ;        8X
-        add hl,de                   ;        2X  + 8X  = 10X
-        jr  num1
-num2:
-        dec bc
-        ex af,af'                   ; restore zero flag
-        jr nz, num3
-        ex de,hl
-        ld hl,0
-        or a
-        sbc hl,de              
-num3:
-        push hl                     ; Put the number on the stack
-        jp (iy)                     ; and process the next character
-
-
-
 
 num:
 		ld hl,$0000				    ; Clear hl to accept the number
 		ld a,(bc)				    ; Get numeral or -
         cp '-'
-        jr nz,xnum0
+        jr nz,num0
         inc bc                      ; no flags are affected
-xnum0:
+num0:
         ex af,af'                   ; save zero flag = 0 for later
-xnum1:
+num1:
         ld a,(bc)         
         sub 30h           
-        jr c, xnum4                 ; not a number, exit loop      
+        jr c, num2                  ; not a number, exit loop      
         inc bc            
         ld d,h            
         ld e,l            
@@ -1394,18 +1333,18 @@ xnum1:
         add hl,hl         
         add a,l           
         ld l,a            
-        jr nc,xnum1    
+        jr nc,num1    
         inc h             
-        jr xnum1      
-xnum4:
+        jr num1      
+num2:
         dec bc
         ex af,af'                   ; restore zero flag
-        jr nz, xnum5
+        jr nz, xnum3
         ex de,hl                    ; negate the value of hl
         ld hl,0
         or a                        ; jump to sub2
         sbc hl,de              
-xnum5:
+xnum3:
         push hl                     ; Put the number on the stack
         jp (iy)                     ; and process the next character
 
