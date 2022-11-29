@@ -105,7 +105,7 @@ iOpcodes:
         DB lsb(nop_)    ;   !            
         DB lsb(nop_)    ;   "
         DB lsb(hexnum_) ;   #
-        DB lsb(nop_)    ;   $            
+        DB lsb(arg_)    ;   $            
         DB lsb(nop_)    ;   %            
         DB lsb(nop_)    ;   &
         DB lsb(nop_)    ;   '
@@ -142,19 +142,19 @@ iOpcodes:
 
         ; REPDAT 26, lsb(call_)		; call a command a, b ....z
         LITDAT 26
-        DB lsb(call_)   ;   a               
-        DB lsb(call_)   ;   b               
-        DB lsb(call_)   ;   c               
-        DB lsb(call_)   ;   d               
-        DB lsb(call_)   ;   e               
+        DB lsb(call_)   ;   A               
+        DB lsb(call_)   ;   B               
+        DB lsb(call_)   ;   C               
+        DB lsb(call_)   ;   D               
+        DB lsb(call_)   ;   E               
         DB lsb(call_)   ;   F               
         DB lsb(call_)   ;   G               
         DB lsb(call_)   ;   h               
         DB lsb(call_)   ;   I               
         DB lsb(call_)   ;   J               
         DB lsb(call_)   ;   K               
-        DB lsb(call_)   ;   l               
-        DB lsb(call_)   ;   m               
+        DB lsb(call_)   ;   L               
+        DB lsb(call_)   ;   M               
         DB lsb(call_)   ;   N               
         DB lsb(call_)   ;   O               
         DB lsb(call_)   ;   p               
@@ -167,7 +167,7 @@ iOpcodes:
         DB lsb(call_)   ;   W               
         DB lsb(call_)   ;   X               
         DB lsb(call_)   ;   Y               
-        DB lsb(call_)   ;   z              
+        DB lsb(call_)   ;   Z              
 
         LITDAT 6
         DB lsb(nop_)    ;   [
@@ -437,7 +437,7 @@ macro:                          ;=25
         ld d,msb(macros)
         push de
         call ENTER		;Siena go operation and jump to it
-        .cstr "\\^"
+        .cstr "go"
 macro1:
         ld bc,(vTIBPtr)
         jr interpret2
@@ -551,7 +551,7 @@ enter:                              ;=9
         call rpush                  ; save Instruction Pointer
         pop bc
         dec bc
-        jp next                    
+        jp      next                    
 
 printStr:                       ;=14
         ex (sp),hl		; swap			
@@ -634,6 +634,8 @@ nesting4:
         .align $100
 page4:
 
+arg_:
+        jp      arg
 and_:        
         pop     de          ;     Bitwise and the top 2 elements of the stack
         pop     hl          ;    
@@ -645,7 +647,7 @@ and_:
 and1:
         ld      h,a         ;   
         push    hl          ;    
-        jp next        ;   
+        jp      next        ;   
         
                             ; 
 or_: 		 
@@ -656,7 +658,7 @@ or_:
         ld      l,a
         ld      a,d
         or      h
-        jr and1
+        jr      and1
 
 xor_:		 
         pop     de              ; Bitwise xor the top 2 elements of the stack
@@ -678,7 +680,7 @@ add_:                           ; add the top 2 members of the stack
         pop     hl                 
         add     hl,de              
         push    hl                 
-        jp next              
+        jp      next              
                                  
 call_:
         ld a,(bc)
@@ -695,7 +697,7 @@ dot_:
 dot2:
         ld a,' '           
         call putchar
-        jp next
+        jp      next
 
 hdot_:                          ; print hexadecimal
         pop     hl
@@ -704,18 +706,23 @@ hdot_:                          ; print hexadecimal
 
 drop_:                          ; Discard the top member of the stack
         pop     hl
-        jp next
+        jp      next
 
+undrop_:
+        dec sp
+        dec sp
+        jp      next
+        
 dup_:        
         pop     hl              ; Duplicate the top member of the stack
         push    hl
         push    hl
-        jp next
+        jp      next
 etx_:
         jp ETX
         
 exit_:
-        inc bc			; store offests into a table of bytes, smaller
+        inc bc			        ; store offests into a table of bytes, smaller
         ld de,bc                
         call rpop               ; Restore Instruction pointer
         ld bc,hl
@@ -729,7 +736,7 @@ fetch1:
         inc hl             
         ld d,(hl)         
         push de              
-        jp next           
+        jp      next           
 
 hexnum_:   
         jp hexnum
@@ -739,12 +746,12 @@ key_:
         ld h,0
         ld l,a
         push hl
-        jp next
+        jp      next
 
 mul_:   jp mul      
 
 nop_:       
-        jp next             ; hardwire white space to always go to next (important for arrays)
+        jp      next             ; hardwire white space to always go to next (important for arrays)
 
 
 over_:  
@@ -753,12 +760,12 @@ over_:
         push de
         push hl
         push de              ; and push it to top of stack
-        jp next        
+        jp      next        
     
 ret_:
         call rpop               ; Restore Instruction pointer
         ld bc,hl                
-        jp next             
+        jp      next             
 
 rot_:                               ; a b c -- b c a
         pop de                      ; a b                   de = c
@@ -766,14 +773,14 @@ rot_:                               ; a b c -- b c a
         ex (sp),hl                  ; b                     hl = a
         push de                     ; b c             
         push hl                     ; b c a                         
-        jp next
+        jp      next
 
 ;  Left shift { is multiply by 2		
 shl_:   
         pop hl                  ; Duplicate the top member of the stack
         add hl,hl
         push hl                 ; shift left fallthrough into add_     
-        jp next                 ;   
+        jp      next                 ;   
     
 				;  Right shift } is a divide by 2		
 shr_:    
@@ -782,7 +789,7 @@ shr1:
         srl h
         RR l
         push hl
-        jp next                 ;   
+        jp      next                 ;   
 
 store_:                         ; Store the value at the address placed on the top of the stack
         pop hl               
@@ -790,13 +797,13 @@ store_:                         ; Store the value at the address placed on the t
         ld (hl),e          
         inc hl              
         ld (hl),d          
-        jp next            
+        jp      next            
                                   
 swap_:                      ; a b -- b a Swap the top 2 elements of the stack
         pop hl
         ex (sp),hl
         push hl
-        jp next
+        jp      next
         
 neg_:   
         ld hl, 0    		; NEGate the value on top of stack (2's complement)
@@ -810,7 +817,7 @@ sub2:
         or a                ;      Entry point for NEGate
         sbc hl,de           ; 15t
         push hl             ;    
-        jp next             ;   
+        jp      next             ;   
                                 ; 5  
 eq_:    
         pop hl
@@ -821,7 +828,7 @@ eq_:
 false_:
         ld hl, 0
         push hl
-        jp next 
+        jp      next 
 
 gt_:    
         pop de
@@ -839,7 +846,7 @@ lt1:
 true_:
         ld hl, 1
         push hl
-        jp next 
+        jp      next 
 
 gte_:    
         pop de
@@ -859,7 +866,7 @@ var_:
         ld a,(bc)
         call lookupRef2
         push hl
-        jp next
+        jp      next
         
 num_:   jp  num
 lambda_:   
@@ -911,7 +918,7 @@ div_:   jr div
         ;falls through 
 
         push hl
-        jp next
+        jp      next
 
 lambda:                             ;=         
         inc bc
@@ -927,7 +934,7 @@ lambda1:                                    ; Skip to end of definition
 lambda2:    
         dec bc
         ld (vHeapPtr),de            ; bump heap ptr to after definiton
-        jp next       
+        jp      next       
 
 ; ********************************************************************
 ; 16-bit division subroutine.
@@ -973,7 +980,7 @@ div4:
         push de                     ; push Result
         push hl                     ; push remainder             
 
-        jp next
+        jp      next
 
         	                    ;=57                     
 
@@ -984,14 +991,14 @@ div4:
 page6:
 
 anop_:
-        jp next                    
+        jp      next                    
 
 cFetch_:
         pop     hl          
         ld      d,0            
         ld      e,(hl)         
         push    de              
-        jp next           
+        jp      next           
   
 comment_:
         inc bc                      ; point to next char
@@ -1005,17 +1012,17 @@ cStore_:
         pop    hl               
         pop    de               
         ld     (hl),e          
-        jp next            
+        jp      next            
                              
 emit_:
         pop hl
         ld a,l
         call putchar
-        jp next
+        jp      next
 
 exec_:
         call exec1
-        jp next
+        jp      next
 exec1:
         pop hl
         ex (sp),hl
@@ -1023,7 +1030,7 @@ exec1:
 
 prompt_:
         call prompt
-        jp next
+        jp      next
 
 
 go_:				                ;\^
@@ -1042,7 +1049,7 @@ go2:
         ld bc,de
         dec bc
 go3:
-        jp next                     
+        jp      next                     
 
 inPort_:			    ; \<
         pop hl
@@ -1052,11 +1059,11 @@ inPort_:			    ; \<
         ld h,0
         ld c,a
         push hl
-        jp next        
+        jp      next        
 
 newln_:
         call crlf
-        jp next        
+        jp      next        
 
 outPort_:
         pop hl
@@ -1065,24 +1072,24 @@ outPort_:
         pop hl
         out (c),l
         ld c,e
-        jp next        
+        jp      next        
 
 prtstr_:
 prtstr:
         pop hl
         call putStr
-        jp next
+        jp      next
 
 
 rpush_:
         pop hl
         call rpush
-        jp next
+        jp      next
 
 rpop_:
         call rpop
         push hl
-        jp next
+        jp      next
 
 ; **************************************************************************
 ; Page 6 primitive routines continued  (page 7) 
@@ -1274,10 +1281,9 @@ print_:
 scan_:
 set_:
 shift_:
-undrop_:
 while_:
 
-        jp next
+        jp      next
 
 ;*******************************************************************
 ; Page 5 primitive routines continued
@@ -1306,7 +1312,7 @@ mul2:
         jr nz,mul2
 		pop bc			            ; Restore the IP
 		push hl                     ; Put the product on the stack - stack bug fixed 2/12/21
-		jp next
+		jp      next
 
 
 num:
@@ -1343,7 +1349,7 @@ num2:
         sbc hl,de              
 xnum3:
         push hl                     ; Put the number on the stack
-        jp next                     ; and process the next character
+        jp      next                     ; and process the next character
 
 
 
@@ -1483,3 +1489,22 @@ crlf:                               ;=7
         .cstr "\r\n"
         ret
 
+arg:
+        inc     bc          ; get next char
+        ld      a,(bc)
+        sub     "1"         ; treat as a digit, 1 based index
+        and     $07         ; mask 
+        add     a,a         ; double
+        ld      l,a
+        ld      h,0
+        ld      e,iyl
+        ld      d,iyh
+        ex      de,hl
+        or      a
+        sbc     hl,de
+        dec     hl
+        ld      d,(hl)
+        dec     hl
+        ld      e,(hl)
+        push    de
+        jp      next

@@ -24,6 +24,8 @@ expect%%M:
 .endm
 
 .macro test,code1,val1
+    LD SP,DSTACK
+    CALL init
     CALL enter
     .cstr code1
     expect code1,val1
